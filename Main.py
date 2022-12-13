@@ -1,6 +1,6 @@
 import numpy as np
 import numpy as nu
-import matplotlib.pyplot as plot
+import matplotlib.pyplot as plt
 import time
 
 '''
@@ -21,6 +21,9 @@ M_Z = 5.98 * 10 ** 24
 R_Z = 6371000
 G = 6.6743 * 10 ** (-11)
 V_1 = nu.sqrt(G * M_Z / R_Z)
+#air dencity formula
+def air_dencity(R_xy):
+    return np.exp(R_xy-R_Z/9.038)*1.23335 - 0.0075
 # --------------------------------------
 
 x_0 = 0.0
@@ -30,16 +33,18 @@ R_xy = (x_0 ** 2 + y_0 ** 2) ** 0.5
 k = G * M_Z
 
 Dt = 0.01
-v_x = 10
-v_y = 15
+v_x = 0
+v_y = 7900
 y_0 = R_Z
 x_0 = 0.0
 x_forplot = [x_0]
 y_forplot = [y_0]
 X_location = x_0
 Y_location = y_0
-for i in range(4):
+listR_xy = [R_Z]
+for i in range(500000):
     R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
+    listR_xy.append(R_xy)
     a_x = -k * X_location * R_xy ** (-3)
     a_y = -k * Y_location * R_xy ** (-3)
     if i % 1 == 0:
@@ -56,10 +61,12 @@ for i in range(4):
         print(
             f'a_x: {round(a_x, 2)} m/s^2,  ay: {round(a_y, 2)} m/s^2,  R: {round(R_xy)} m,  t: {round(i / 3600000, 2)} h')
         print("Location (x,y):", [round(X_location, 0), round(Y_location)], "m\n")'''
+maxR_xy = max(R_xy)
 
-# plot.scatter(x_forplot, y_forplot, color='r', lw=1)
-x = np.linspace(-R_Z, R_Z)
-y = np.sqrt(R_Z ** 2 - x ** 2)
-plot.plot(x, y, color='g', lw=3, label='ziemia')
-plot.plot(x, -y, color='g', lw=3, label='ziemia')
-plot.show()
+
+plt.plot(x_forplot, y_forplot, color='g')
+theta = np.arange(0, np.pi * 2, 0.01)
+plt.plot(R_Z * np.cos(theta), R_Z * np.sin(theta), color='b')
+plt.show()
+
+

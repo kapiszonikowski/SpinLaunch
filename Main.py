@@ -57,7 +57,7 @@ for i in range(4):
             f'a_x: {round(a_x, 2)} m/s^2,  ay: {round(a_y, 2)} m/s^2,  R: {round(R_xy)} m,  t: {round(i / 3600000, 2)} h')
         print("Location (x,y):", [round(X_location, 0), round(Y_location)], "m\n")'''
 
-# plot.scatter(x_forplot, y_forplot, color='r', lw=1)
+plot.scatter(x_forplot, y_forplot, color='r', lw=1)
 x = np.linspace(-R_Z, R_Z)
 y = np.sqrt(R_Z ** 2 - x ** 2)
 plot.plot(x, y, color='g', lw=3, label='ziemia')

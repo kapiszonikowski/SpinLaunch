@@ -50,8 +50,8 @@ R_xy = (x_0 ** 2 + y_0 ** 2) ** 0.5
 k = G * M_Z
 
 Dt = 0.01
-v_x0 = 1000
-v_y0 = 1500
+v_x0 = 4000
+v_y0 = 3000
 v_x = v_x0
 v_y = v_y0
 v_xy = float((v_y ** 2 + v_y ** 2) ** 0.5)
@@ -63,7 +63,7 @@ X_location = x_0
 Y_location = y_0
 listR_xy = [R_Z]
 droga = 0
-for i in range(50000):
+for i in range(90000):
     R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
     listR_xy.append(R_xy)
     a_x = -k * X_location * R_xy ** (-3) - drag_altitude(R_xy, v_x)
@@ -82,6 +82,7 @@ for i in range(50000):
             f'a_x: {round(a_x, 2)} m/s^2,  ay: {round(a_y, 2)} m/s^2,  R: {round(R_xy)} m,  t: {round(i / 3600000, 2)} h')
         print("Location (x,y):", [round(X_location, 0), round(Y_location)], "m\n")'''
 
+#napisy
 nd = round((droga / 1000), 2)
 nw = round((max(listR_xy) - R_Z) / 1000, 2)
 napis_drogi = f'droga przebyta przez ciao: {nd}km'
@@ -89,11 +90,13 @@ napis_wysokości = f'maksymalna wysokość ciała n.p.k: {nw}km'
 napis_prędkości = f'początkowe prędkości ciał [km/s]: Vx = {round(v_x0/1000, 2)} ; Vy = {round(v_y0/1000, 2)}'
 
 #dodawanie wykresu
+n = -0.8*R_Z
 plt.plot(x_forplot, y_forplot, color='g')
 theta = np.arange(0, np.pi * 2, 0.01)
 plt.plot(R_Z * np.cos(theta), R_Z * np.sin(theta), color='b')
-plt.text(-0.9 * R_Z, 0.2 * R_Z, napis_prędkości, fontsize=10)
-plt.text(-0.6 * R_Z, 0.1 * R_Z, napis_drogi, fontsize=10)
-plt.text(-0.6 * R_Z, 0.0 * R_Z, napis_wysokości, fontsize=10)
+#plt.text(-0.2 * R_Z, 0.3 * R_Z, 'z tarciem', fontsize=10)
+plt.text(n, 0.2 * R_Z, napis_prędkości, fontsize=10)
+plt.text(n, 0.1 * R_Z, napis_drogi, fontsize=10)
+plt.text(n, 0.0 * R_Z, napis_wysokości, fontsize=10)
 plt.show()
 

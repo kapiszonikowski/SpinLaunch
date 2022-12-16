@@ -23,7 +23,7 @@ v_g = 25000          #prędkość gazów wylotowych
 m_m = 10300         #masa całego modułu
 m_r_p = 1000          #początkowa masa rakiety
 m_p = 330          #masa paliwa
-Dm_1s = m_p / 30   #paliwo tracone w czasie 1 s
+Dm_1s = m_p / 5 / 60   #paliwo tracone w czasie 1 s
 m_r = m_r_p
 Hnpm = R_xy - R_Z
 
@@ -53,7 +53,7 @@ def thrust_acceleration(x1, x0, y1, y0):
 Dt = 0.01
 v_x0 = 1000
 v_y0 = 1800
-v_g = 7000
+v_g = 15000
 v_x = v_x0
 v_y = v_y0
 v_xy = float((v_y ** 2 + v_y ** 2) ** 0.5)

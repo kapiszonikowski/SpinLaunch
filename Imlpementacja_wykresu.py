@@ -13,7 +13,7 @@ fig, ax = plt.subplots()
 line, = ax.plot(t, f(t, init_freq))
 ax.set_xlabel('Czas [s]')
 ax.set_ylabel('Amplituda')
-fig.subplots_adjust(bottom=0.25)
+fig.subplots_adjust(bottom=0.8, top=1)
 axfreq = fig.add_axes([0.25, 0.1, 0.65, 0.05])
 
 freq_slider = Slider(

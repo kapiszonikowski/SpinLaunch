@@ -25,7 +25,7 @@ Dt = 0.01                                           #jak często zmienia się cz
 
 #Listy------------------------------------------------------------------------------------------------------------------
 v_x0 = 1000                                         #prędkość początkowa y
-v_y0 = 1700                                         #prędkość początkowa y
+v_y0 = 1800                                         #prędkość początkowa y
 
 X_location = x_0                                    #zmienna położenia x
 Y_location = y_0                                    #zmienna położenia y
@@ -60,6 +60,9 @@ d_a_lx = []
 d_a_ly = []
 
 #Funkcje----------------------------------------------------------------------------------------------------------------
+def prędkość_kosmiczna(R):
+    return nu.sqrt(G * M_Z / R)
+
 def air_density(R_xy):                    # air density formula
     if R_xy < R_Z + 100000:
         return 2.718281828 ** (((R_Z - R_xy) / 1000 / 9.038)) * 1.23335
@@ -109,7 +112,7 @@ def print_important_values():
 
 v_g = 8750          #prędkość gazów wylotowych
 m_r_p = 1000          #początkowa masa rakiety
-m_p = 549        #masa paliwa
+m_p = 600        #masa paliwa
 Dm_1s = m_p / 150   #paliwo tracone w czasie 1 s
 m_r = m_r_p                                         #zmienna masa rakiety
 
@@ -118,25 +121,25 @@ n = 0                   #ilość iteracji
 #Oblicanie trajektorii-------------------------------------------------------------------------------------------------
 
                                                         #Silniki nie zadzaiłały-----------------------------------------
-print(2 * nu.pi * R_Z)
+
 for i in range(500000):
     if R_xy > R_Z:
         if v_x > 0:
             a_x = -k * sin(X1_location, Y1_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_x,
                                                                                       m_m)  # x-acceleration update
-            d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
+            #d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
         else:
             a_x = -k * sin(X1_location, Y1_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_x,
                                                                                       m_m)  # x-acceleration update
-            d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
+            #d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
         if v_y > 0:
             a_y = -k * cos(X1_location, Y1_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_y,
                                                                                       m_m)  # x-acceleration update
-            d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
+            #d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
         else:
             a_y = -k * cos(X1_location, Y1_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_y,
                                                                                       m_m)  # y-acceleration update
-            d_a_ly.append(drag_acceleration(R_xy, v_y, m_m))
+            #d_a_ly.append(drag_acceleration(R_xy, v_y, m_m))
 
         v_x = v_x + a_x * Dt                                        #x-speed update
         v_y = v_y + a_y * Dt                                        #y-speed update
@@ -151,266 +154,63 @@ for i in range(500000):
         R_xy = (X1_location ** 2 + Y1_location ** 2) ** 0.5
         listH_xy1.append(Hnpm)
 
+        if listH_xy1[i] - listH_xy1[i-1] < 0:
+            a = i
+        if round(listH_xy1[i],-1) == 100000 and listH_xy1[i] - listH_xy1[i-1] < 0:
+            b = i
+            #print(v_x, v_y)
         #print_important_values()
-        '''if i % 100 == 0:
-                try:
-                    print(f'cos(x) = {cos(x1_forplot[i], y1_forplot[i])} || sin(x) = {sin(x1_forplot[i], y1_forplot[i])}')
-                    print(f'względne przemieszcanie x = {D_osi(x1_forplot[i], x1_forplot[i - 1]) / przemieszczenie(x1_forplot[i], x1_forplot[i - 1], y1_forplot[i], y1_forplot[i - 1])} || względne przemieszczenie y = {D_osi(y1_forplot[i], y1_forplot[i - 1]) / przemieszczenie(x1_forplot[i], x1_forplot[i - 1], y1_forplot[i], y1_forplot[i - 1])}\n')
-                except:
-                    pass''' #względne przemieszenie, a warkości trygonometryczne
     else:
         break
-
+#print(a, b)
 listH_xy1.sort()
 H_startu = listH_xy1[-2]
 print(H_startu)
 
-v_x = v_x0
-v_y = v_y0
-
-for i in range(500000):                                 #I faza ruchu - do odpalenia silników---------------------------
-    if Hnpm < 85000:
-        if v_x > 0:
-            a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_x,
-                                                                                      m_m)  # x-acceleration update
-            d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
-        else:
-            a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_x,
-                                                                                      m_m)  # x-acceleration update
-            d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
-        if v_y > 0:
-            a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_y,
-                                                                                      m_m)  # x-acceleration update
-            d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
-        else:
-            a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_y,
-                                                                                      m_m)  # y-acceleration update
-            d_a_ly.append(+drag_acceleration(R_xy, v_y, m_m))
-
-        v_x = v_x + a_x * Dt  # x-speed update
-        v_y = v_y + a_y * Dt  # y-speed update
-
-        X_location = X_location + v_x * Dt + 0.5 * a_x * Dt ** 2  # x-location update
-        Y_location = Y_location + v_y * Dt + 0.5 * a_y * Dt ** 2  # y-location update
-
-        x_forplot.append(X_location)
-        y_forplot.append(Y_location)
-
-        R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
-        droga = droga + ((x_forplot[i] - x_forplot[i - 1]) ** 2 + (y_forplot[i] - y_forplot[i - 1]) ** 2) ** 0.5
-        Hnpm = R_xy - R_Z
-
-        droga_l.append(droga)
-        listR_xy.append(R_xy)
-        listH_xy.append(Hnpm/1000)
-        v_xy_l.append(v_xy(v_x, v_y))
-        v_x_l.append(v_x)
-        v_y_l.append((v_y))
-        a_y_l.append(a_y)
-        a_x_l.append(a_x)
-        a_xy_l.append(a_xy(a_x, a_y))
-
-        # print_important_values()
-
-    else:
-        n = i
-        break
-
-print(max(listH_xy) * 1000)
-
-update_important_location(X_location, Y_location)
-wazny_d.append(droga)
-wazny_a.append(a_xy(a_x, a_y))
-wazny_v.append(v_xy(v_x, v_y))
-wazny_h.append(Hnpm/1000)
-
-for i in range(5000000):                                 #II faza ruchu - z silnikami-----------------------------------
-    if m_r > m_r_p - m_p and R_Z < R_xy:
-        '''a_t_x = D_osi(x_forplot[i], x_forplot[i-1]) * thrust_acceleration(x_forplot[i], x_forplot[i-1], y_forplot[i], y_forplot[i-1])
-        a_t_y = D_osi(y_forplot[i], y_forplot[i-1]) * thrust_acceleration(x_forplot[i], x_forplot[i-1], y_forplot[i], y_forplot[i-1])'''    #stare przyśpieszenie
-        a_t_x = cos(X_location, Y_location) * thrust_acceleration1()
-        a_t_y = -sin(X_location, Y_location) * thrust_acceleration1()
-
-        if v_x > 0:
-            a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_x,
-                                                                                m_r) + a_t_x  # x-acceleration update
-            d_a_lx.append(-drag_acceleration(R_xy, v_x, m_r))
-        else:
-            a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_x,
-                                                                                m_r) + a_t_x # x-acceleration update
-            d_a_lx.append(drag_acceleration(R_xy, v_x, m_r))
-        if v_y > 0:
-            a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_y,
-                                                                                m_r) + a_t_y # x-acceleration update
-            d_a_ly.append(-drag_acceleration(R_xy, v_y, m_r))
-        else:
-            a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_y,
-                                                                                m_r) + a_t_y # y-acceleration update
-            d_a_ly.append(drag_acceleration(R_xy, v_y, m_r))
-
-        m_r = m_r - Dm_1s * Dt                                      #rocket mass update
-
-        v_x = v_x + a_x * Dt                                        #x-speed update
-        v_y = v_y + a_y * Dt                                        #y-speed update
-
-        X_location = X_location + v_x * Dt + 0.5 * a_x * Dt ** 2    #x-location update
-        Y_location = Y_location + v_y * Dt + 0.5 * a_y * Dt ** 2    #y-location update
-
-        x_forplot.append(X_location)
-        y_forplot.append(Y_location)
-
-        droga = droga + ((x_forplot[n] - x_forplot[n - 1]) ** 2 + (y_forplot[n] - y_forplot[n - 1]) ** 2) ** 0.5
-        Hnpm = R_xy - R_Z
-        R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
-        if v_xy(v_x, v_y) >= nu.sqrt(G * M_Z / R_xy):
-            break
-
-        listR_xy.append(R_xy)
-        listH_xy.append(Hnpm/1000)
-        v_xy_l.append(v_xy(v_x, v_y))
-        v_x_l.append((v_x))
-        v_y_l.append((v_y))
-        droga_l.append(droga)
-        a_y_l.append(a_y)
-        a_x_l.append(a_x)
-        a_xy_l.append(a_xy(a_x, a_y))
-        #if i % n == 0:
-            #print_important_values()
-    else:
-        n =+ i
-        break
-
-print()
-print(listH_xy[-1])
-print(nu.sqrt(G * M_Z / listR_xy[-1]))
-print(max(v_xy_l))
-
-update_important_location(X_location, Y_location)
-wazny_d.append(droga)
-wazny_a.append(a_xy(a_x, a_y))
-wazny_v.append(v_xy(v_x, v_y))
-wazny_h.append(Hnpm/1000)
-
-for i in range(500000):                                 #III faza ruchu - po wyczerpaniu paliwa-------------------------
-    if R_xy > R_Z:
-        if v_x > 0:
-            a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_x, m_r)  # x-acceleration update
-            d_a_lx.append(-drag_acceleration(R_xy, v_x, m_r))
-        else:
-            a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_x, m_r)  # x-acceleration update
-            d_a_lx.append(drag_acceleration(R_xy, v_x, m_r))
-        if v_y > 0:
-            a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_y, m_r)  # x-acceleration update
-            d_a_ly.append(-drag_acceleration(R_xy, v_y, m_r))
-        else:
-            a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_y, m_r)  # y-acceleration update
-            d_a_ly.append(drag_acceleration(R_xy, v_y, m_r))
-
-
-        v_x = v_x + a_x * Dt  # x-speed update
-        v_y = v_y + a_y * Dt  # y-speed update
-
-        X_location = X_location + v_x * Dt + 0.5 * a_x * Dt ** 2  # x-location update
-        Y_location = Y_location + v_y * Dt + 0.5 * a_y * Dt ** 2  # y-location update
-
-        x_forplot.append(X_location)
-        y_forplot.append(Y_location)
-
-        R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
-        droga = droga + ((x_forplot[n] - x_forplot[n - 1]) ** 2 + (y_forplot[n] - y_forplot[n - 1]) ** 2) ** 0.5
-        Hnpm = R_xy - R_Z
-
-        if droga > 2 * nu.pi * R_Z:
-            break
-
-        listR_xy.append(R_xy)
-        listH_xy.append(Hnpm / 1000)
-        v_xy_l.append(v_xy(v_x, v_y))
-        v_x_l.append((v_x))
-        v_y_l.append((v_y))
-        droga_l.append(droga)
-        a_y_l.append(a_y)
-        a_x_l.append(a_x)
-        a_xy_l.append(a_xy(a_x, a_y))
-        # print_important_values()
-
-    else:
-        n =+ i
-        break
-
-print(2 * nu.pi * R_Z)
-
-
-#Tworzenie tekstu-------------------------------------------------------------------------------------------------------
-nd = round((droga / 1000), 2)
-nw = round((max(listR_xy) - R_Z) / 1000, 2)
-napis_drogi = f'droga przebyta przez ciao: {nd}km'
-napis_wysokości = f'maksymalna wysokość ciała n.p.k: {nw}km'
-napis_prędkości = f'początkowe prędkości ciał [km/s]: Vx = {round(v_x0/1000, 2)} ; Vy = {round(v_y0/1000, 2)}'
-napis_paliwa = f'masa paliwa: {m_p}kg'
-napis_gazów = f'prędkość gazów wylotowych: {v_g}m\s'
-
-#dodawanie wykresu------------------------------------------------------------------------------------------------------
-plt.subplot(212)
 n = -0.8*R_Z
 plt.axis('square')
-plt.plot(x_forplot, y_forplot, color='g', label='trajektoria rakiety')
+#plt.plot(x_forplot, y_forplot, color='g', label='trajektoria rakiety')
 plt.plot(x1_forplot, y1_forplot, color='r',lw=0.5, label='trajektoria osłony')
 plt.xlim(-2*R_Z, 2*R_Z)
 plt.ylim(-2*R_Z, 2*R_Z)
 theta = np.arange(0, np.pi * 2, 0.01)
 plt.plot(R_Z * np.cos(theta), R_Z * np.sin(theta),lw=2, color='b', label='Ziemia')   #model ziemi
 plt.plot((R_Z + 100000) * np.cos(theta), (R_Z + 100000) * np.sin(theta), color='y', lw=0.3)
-plt.scatter(wazny_x, wazny_y)                                   # początak i start działania silników
-plt.text(-0.2 * R_Z, 0.3 * R_Z, 'z tarciem', fontsize=10)
-plt.text(n, 0.2 * R_Z, napis_prędkości, fontsize=10)
-plt.text(n, 0.1 * R_Z, napis_paliwa, fontsize=10)
-plt.text(n, 0.0 * R_Z, napis_gazów, fontsize=10)
+#plt.scatter(wazny_x, wazny_y)                                   # początak i start działania silników
+#plt.text(-0.2 * R_Z, 0.3 * R_Z, 'z tarciem', fontsize=10)
+#plt.text(n, 0.2 * R_Z, napis_prędkości, fontsize=10)
+#plt.text(n, 0.1 * R_Z, napis_paliwa, fontsize=10)
+#plt.text(n, 0.0 * R_Z, napis_gazów, fontsize=10)
 plt.legend()
 plt.xlabel('oś X')
 plt.ylabel('oś Y')
+figManager = plt.get_current_fig_manager()
+figManager.window.showMaximized()
+plt.margins(0.05)
+#plt.show()
 
-plt.subplot(211)
-x = np.linspace(0, max(droga_l), 100)
-y = 0 * x + 100
-plt.plot(x, y, color='b',lw = 1, ls='--',label='koniec atmosfery' )
-plt.plot(droga_l, listH_xy, color='b',lw = 1, ls='-',label='Hxy_(d) [km]')
-plt.scatter(wazny_d, wazny_h, label='d_h_t')
-plt.legend()
-plt.xlabel('m')
-plt.ylabel('km')
+def f(t):
+    return np.exp(-t) * np.cos(2*np.pi*t)
 
-plt.show()
 
-plt.subplot(311)
-plt.plot(droga_l, a_xy_l, color='g',lw = 3, ls='dotted',label='a_xy(d)')
-plt.plot(droga_l, a_x_l, color='r',lw = 1, ls='-',label='a_x(d)')
-plt.plot(droga_l, a_y_l, color='y',lw = 1, ls='-',label='a_y(d)')
-plt.scatter(wazny_d, wazny_a, label='d_a_t')
-plt.legend()
-plt.xlabel('m')
-plt.ylabel('m/s^2')
+t1 = np.arange(0.0, 3.0, 0.01)
 
-plt.subplot(312)
-plt.plot(droga_l, v_xy_l, color='g',lw = 3, ls='dotted',label='v_xy(d) [m/s]')
-plt.plot(droga_l, v_x_l, color='r',lw = 1, ls='-',label='v_x(d) [m/s]')
-plt.plot(droga_l, v_y_l, color='y',lw = 1, ls='-',label='v_y(d) [m/s]')
-plt.scatter(wazny_d, wazny_v, label='d_v_t')
-plt.legend()
-plt.xlabel('km')
-plt.ylabel('m/s)')
+ax1 = plt.subplot(212)
+ax1.margins(0.05)           # Default margin is 0.05, value 0 means fit
+ax1.plot(t1, f(t1))
 
-plt.subplot(313)
-x = np.linspace(0, max(droga_l), 100)
-y = 0 * x + 100
-plt.plot(x, y, color='b',lw = 1, ls='--',label='koniec atmosfery' )
-plt.plot(droga_l, listH_xy, color='b',lw = 1, ls='-',label='Hxy_(d) [km]')
-plt.scatter(wazny_d, wazny_h, label='d_h_t')
-plt.legend()
-plt.xlabel('m')
-plt.ylabel('km')
+ax2 = plt.subplot(221)
+ax2.margins(2, 2)           # Values >0.0 zoom out
+ax2.plot(t1, f(t1))
+ax2.set_title('Zoomed out')
+
+ax3 = plt.subplot(222)
+ax3.margins(x=0, y=-0.25)   # Values in (-0.5, 0.0) zooms in to center
+ax3.plot(t1, f(t1))
+ax3.set_title('Zoomed in')
 
 plt.show()
+
 
 
 

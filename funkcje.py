@@ -313,5 +313,16 @@ def reset_xyv():
     X_location = x_0
     Y_location = y_0
 
+def clear():
+    global wazny_h, x_forplot, x1_forplot, y_forplot, y1_forplot, droga_l, listH_xy, listH_xy1, listR_xy, v_xy_l, v_x_l, v_y_l, a_xy_l, a_x_l, a_y_l
+
+    x_forplot, x1_forplot = [], []
+    y_forplot, y1_forplot = [], []
+    listR_xy = [R_xy]  # potrzebne? -> TAK
+    listH_xy, listH_xy1 = [], []
+    wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x = [], [], [], [], [], []
+    v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly = [], [], [], [], [], [], [], [], []
+
+
 
 

@@ -1,5 +1,9 @@
 from constants import *
 
+
+
+
+
 # a_t_x = D_osi(x_forplot[n], x_forplot[n-1]) * thrust_acceleration(x_forplot[n], x_forplot[n-1], y_forplot[n], y_forplot[n-1])
 # a_t_y = D_osi(y_forplot[n], y_forplot[n-1]) * thrust_acceleration(x_forplot[n], x_forplot[n-1], y_forplot[n], y_forplot[n-1])    #stare przyśpieszenie
 # m_r = m_r - Dm_1s * Dt / 1  # rocket mass update
@@ -196,7 +200,8 @@ def naprowadzanie_na_orbite():
             a_t_y = 0
     return a_t_x, a_t_y
 
-def obliczenia_numeryczne(faza, important_values):
+
+def obliczenia_numeryczne(faza, print_important_values, wysokość):
     global R_xy, v_x, X_location, Y_location, v_y, m_r, a_x, a_y, droga, Hnpm, a_t_x, a_t_y, a_x
 
     if faza == 0:
@@ -205,16 +210,16 @@ def obliczenia_numeryczne(faza, important_values):
 
             updates_appends(faza)
 
-            if important_values == 1:
+            if print_important_values == 1:
                 print_important_values()
 
     if faza == 1:
-        while Hnpm < 140000:
+        while Hnpm < wysokość:
             obliczanie_przyspieszenia(faza)
 
             updates_appends(faza)
 
-            if important_values == 1:
+            if print_important_values == 1:
                 print_important_values()
 
     if faza == 2:
@@ -229,7 +234,7 @@ def obliczenia_numeryczne(faza, important_values):
 
             updates_appends(faza)
 
-            if important_values == 1:
+            if print_important_values == 1:
                 print_important_values()
 
     if faza == 3:
@@ -242,8 +247,9 @@ def obliczenia_numeryczne(faza, important_values):
 
             updates_appends(faza)
 
-            if important_values == 1:
+            if print_important_values == 1:
                 print_important_values()
+
 
 def prędkość_kosmiczna(R):
     return np.sqrt(G * M_Z / R)
@@ -274,6 +280,7 @@ def thrust_acceleration(x1, x0, y1, y0):
 
 def thrust_acceleration1():
     return (v_g * Dm_1s + 0.01 * S * 10 * air_density(R_xy)) / m_r
+
 
 def update_important_values(x, y, d, h, a, v):
     wazny_x.append(x)

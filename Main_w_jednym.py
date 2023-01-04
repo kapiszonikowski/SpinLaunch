@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.widgets import Cursor, Slider
 import pygame
 
 # Stałe------------------------------------------------------------------------------------------------------------------
@@ -396,19 +398,12 @@ def reset_xyv():
 def clear():
     global wazny_h, x_forplot, x1_forplot, y_forplot, y1_forplot, droga_l, listH_xy, listH_xy1, listR_xy, v_xy_l, v_x_l, v_y_l, a_xy_l, a_x_l, a_y_l
 
-    x_forplot, x1_forplot = [], []
-    y_forplot, y1_forplot = [], []
+    x_forplot, x1_forplot = [X_location], [X_location]
+    y_forplot, y1_forplot = [Y_location], [Y_location]
     listR_xy = [R_xy]  # potrzebne? -> TAK
     listH_xy, listH_xy1 = [], []
     wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x = [], [], [], [], [], []
     v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly = [], [], [], [], [], [], [], [], []
-
-
-import matplotlib.pyplot as plt
-from matplotlib.widgets import Cursor, Slider
-
-
-
 
 def wyświetlanie_wykresów(orbita, dane, spin):
     # Tworzenie tekstu-------------------------------------------------------------------------------------------------------
@@ -540,37 +535,42 @@ def wyświetlanie_wykresów(orbita, dane, spin):
 
 
 spin = 1  # spin = 1 odpalamy spinlauncha
-if spin == 1:
 
-    v_x0 = 1000
-    v_y0 = 100
+if spin == 1:
+    v_x0 = 100
+    v_y0 = 1000
     v_x = v_x0
     v_y = v_y0
     H_startu = 100000
     jak_często = 1
 
-    obliczenia_numeryczne(0, 0, wysokość=H_startu, tryb_pracy_silników=2)  # Silniki nie zadzaiłały
+    obliczenia_numeryczne(0, 1, wysokość=H_startu, tryb_pracy_silników=2)  # Silniki nie zadzaiłały
 
     reset_xyv()  # resetuje wartości po I przelocie
     print('a')
 
-    obliczenia_numeryczne(1, 0, wysokość=H_startu, tryb_pracy_silników=2)  # I faza ruchu - do odpalenia silników
+    obliczenia_numeryczne(1, 1, wysokość=H_startu,
+                          tryb_pracy_silników=2)  # I faza ruchu - do odpalenia silników
 
-    print('a')
-    if Hnpm > 0 and Hnpm < H_startu:
-        update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1], v_xy_l[-1])
     print('a')
 
     obliczenia_numeryczne(2, 1, wysokość=H_startu, tryb_pracy_silników=2)  # II faza ruchu - z silnikami
     print('a')
 
     if test == 1:
-        update_important_values(x_forplot[1], y_forplot[1], droga_l[1], listH_xy[1], a_xy_l[1], v_xy_l[1])
-        update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1], v_xy_l[-1])
+        update_important_values(x_forplot[0], y_forplot[0], droga_l[0], listH_xy[0], a_xy_l[0], v_xy_l[0])
+        update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1],
+                                v_xy_l[-1])
         test = 0
-    obliczenia_numeryczne(3, 0, wysokość=H_startu, tryb_pracy_silników=2)  # III faza ruchu - po wyczerpaniu paliwa
+    print('a')
+    obliczenia_numeryczne(3, 0, wysokość=H_startu,
+                          tryb_pracy_silników=2)  # III faza ruchu - po wyczerpaniu paliwa
+    print('a')
+    print(x1_forplot)
+    print(d_a_ly)
 
-    wyświetlanie_wykresów(1, 1, spin)  # 0 nie wyświetlam, 1 wyświetlam
+    wyświetlanie_wykresów(1, 1)  # 0 nie wyświetlam, 1 wyświetlam
+    print('a')
 
 if spin != 1:
     test = 1
@@ -642,7 +642,8 @@ if spin != 1:
             test = 1
 
     print(droga_l)
-    obliczenia_numeryczne(1, 0, wysokość=H_startu, tryb_pracy_silników=tryb)  # I faza ruchu - do odpalenia silników
+    obliczenia_numeryczne(1, 0, wysokość=H_startu,
+                          tryb_pracy_silników=tryb)  # I faza ruchu - do odpalenia silników
     print(droga_l)
     '''try:
         update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1], v_xy_l[-1])
@@ -671,7 +672,8 @@ if spin != 1:
 
     test1 = Hnpm
     if 0 < Hnpm < H_startu:
-        update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1], v_xy_l[-1])
+        update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1],
+                                v_xy_l[-1])
 
     obliczenia_numeryczne(2, 0, wysokość=H_startu, tryb_pracy_silników=tryb)  # II faza ruchu - z silnikami
     print(droga_l)
@@ -679,9 +681,11 @@ if spin != 1:
         update_important_values(x_forplot[1], y_forplot[1], droga_l[1], listH_xy[1], a_xy_l[1], v_xy_l[1])
 
     if test == 1:
-        update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1], v_xy_l[-1])
+        update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1],
+                                v_xy_l[-1])
 
-    obliczenia_numeryczne(3, 0, wysokość=H_startu, tryb_pracy_silników=tryb)  # III faza ruchu - po wyczerpaniu paliwa
+    obliczenia_numeryczne(3, 0, wysokość=H_startu,
+                          tryb_pracy_silników=tryb)  # III faza ruchu - po wyczerpaniu paliwa
     print(droga_l)
 
-    wyświetlanie_wykresów(0, 1, spin)  # 0 nie wyświetlam, 1 wyświetlam
+    wyświetlanie_wykresów(0, 1)  # 0 nie wyświetlam, 1 wyświetlam

@@ -1,15 +1,11 @@
 import sys
-import matplotlib
 import pygame
 import numpy as np
-import matplotlib as plt
+import matplotlib
 import matplotlib.pyplot as plt
-from pygame.locals import *
-from Impementacja_wykresu import *
-from constants import *
-from funkcje import *
+from matplotlib.widgets import Cursor, Slider
+import time
 
-import pygame
 
 # Stałe------------------------------------------------------------------------------------------------------------------
 M_Z = 5.98 * 10 ** 24  # masa ziemi
@@ -406,24 +402,20 @@ def reset_xyv():
 def clear():
     global wazny_h, x_forplot, x1_forplot, y_forplot, y1_forplot, droga_l, listH_xy, listH_xy1, listR_xy, v_xy_l, v_x_l, v_y_l, a_xy_l, a_x_l, a_y_l
 
-    x_forplot, x1_forplot = [], []
-    y_forplot, y1_forplot = [], []
+    x_forplot, x1_forplot = [X_location], [X_location]
+    y_forplot, y1_forplot = [Y_location], [Y_location]
     listR_xy = [R_xy]  # potrzebne? -> TAK
     listH_xy, listH_xy1 = [], []
     wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x = [], [], [], [], [], []
     v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly = [], [], [], [], [], [], [], [], []
 
-
-import matplotlib.pyplot as plt
-from matplotlib.widgets import Cursor, Slider
-
 def wyświetlanie_wykresów(orbita, dane):
 
     # Tworzenie tekstu-------------------------------------------------------------------------------------------------------
-    #nd = round((droga / 1000), 2)
-    #nw = round((max(listR_xy) - R_Z) / 1000, 2)
-    #napis_drogi = f'droga przebyta przez ciao: {nd}km'
-    #napis_wysokości = f'maksymalna wysokość ciała n.p.k: {nw}km'
+    nd = round((droga / 1000), 2)
+    nw = round((max(listR_xy) - R_Z) / 1000, 2)
+    napis_drogi = f'droga przebyta przez ciao: {nd}km'
+    napis_wysokości = f'maksymalna wysokość ciała n.p.k: {nw}km'
     napis_prędkości = f'początkowe prędkości ciał [km/s]: Vx = {round(v_x0 / 1000, 2)} ; Vy = {round(v_y0 / 1000, 2)}'
     napis_paliwa = f'masa paliwa: {m_p}kg'
     napis_gazów = f'prędkość gazów wylotowych: {v_g}m\s'
@@ -540,7 +532,7 @@ def wyświetlanie_wykresów(orbita, dane):
         # figManager = plt.get_current_fig_manager()
         # figManager.window.showMaximized()
         plt.show()
-import time
+
 
 pygame.init()
 
@@ -834,7 +826,7 @@ def data_input():
                 print(d_a_ly)
 
 
-                wyświetlanie_wykresów(1, 1)  # 0 nie wyświetlam, 1 wyświetlam
+                #wyświetlanie_wykresów(1, 1)  # 0 nie wyświetlam, 1 wyświetlam
                 print('a')
 
             if spin != 1:
@@ -1148,3 +1140,4 @@ def oknowyboru():
 
 pygame.init()
 oknowyboru()
+

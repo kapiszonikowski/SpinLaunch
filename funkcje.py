@@ -1,4 +1,40 @@
 from constants import *
+import constants as con
+
+
+
+M_Z = con.M_Z           #masa ziemi
+R_Z = con.R_Z                   #promień ziemi
+G = con.G        #stała grawitacyjna
+V_1 = con.V_1    #I prędkośćkosmiczna
+x_0 = con.x_0           #pocztkowy x
+y_0 = con.y_0                  #pocztkowy y
+k = con.k                     #wsp staej grawitacji
+Dt = con.Dt                       #czas aktualizacji
+#alpha = nu.angle(0, deg=True)
+f = con.f                 # Drag coefficient for rocket
+S = con.S    # Rocket cross-section
+m_m = con.m_m         #masa całego modułu
+v_g = con.v_g          #prędkość gazów wylotowych
+m_r_p = con.m_r_p          #początkowa masa rakiety
+jak_często = con.jak_często          #gęstość rozmieszczenia punktów - dla 100 pokazuje lokalizacje co 1s
+
+#zmienne----------------------------------------------------------------------------------------------------------------
+droga = con.droga                                         #zmienna drogi
+v_x0 = con.v_x0                                         #prędkość początkowa y
+v_y0 = con.v_y0                                         #prędkość początkowa y
+X_location = x_0                                    #zmienna położenia x
+Y_location = y_0                                    #zmienna położenia y
+R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5   #odległość rakiety od środka ziemi
+Hnpm = R_xy - R_Z                                   #wysokość npm
+v_x = v_x0                                          #zmienna prędkości x
+v_y = v_y0                                          #zmienna prędkości y
+H_startu = 100000
+i = 0                                               #ilość punktów
+spin = 1
+m_r = m_r_p     #zmienna masa rakiety
+m_p = 600        #masa paliwa
+Dm_1s = m_p / 150   #paliwo tracone w czasie 1 s
 
 
 
@@ -201,8 +237,8 @@ def naprowadzanie_na_orbite():
     return a_t_x, a_t_y
 
 
-def obliczenia_numeryczne(faza, print_important_values, wysokość):
-    global R_xy, v_x, X_location, Y_location, v_y, m_r, a_x, a_y, droga, Hnpm, a_t_x, a_t_y, a_x
+def obliczenia_numeryczne(faza, p_important_values, wysokość):
+    global test, R_xy, v_x, X_location, Y_location, v_y, m_r, a_x, a_y, droga, Hnpm, a_t_x, a_t_y, a_x
 
     if faza == 0:
         while R_xy > R_Z:
@@ -210,16 +246,16 @@ def obliczenia_numeryczne(faza, print_important_values, wysokość):
 
             updates_appends(faza)
 
-            if print_important_values == 1:
+            if p_important_values == 1:
                 print_important_values()
 
     if faza == 1:
-        while Hnpm < wysokość:
+        while Hnpm < wysokość and R_xy > R_Z:
             obliczanie_przyspieszenia(faza)
 
             updates_appends(faza)
 
-            if print_important_values == 1:
+            if p_important_values == 1:
                 print_important_values()
 
     if faza == 2:
@@ -234,9 +270,9 @@ def obliczenia_numeryczne(faza, print_important_values, wysokość):
 
             updates_appends(faza)
 
-            if print_important_values == 1:
+            if p_important_values == 1:
                 print_important_values()
-
+            test = 1
     if faza == 3:
         while R_xy > R_Z:
 
@@ -247,7 +283,7 @@ def obliczenia_numeryczne(faza, print_important_values, wysokość):
 
             updates_appends(faza)
 
-            if print_important_values == 1:
+            if p_important_values == 1:
                 print_important_values()
 
 

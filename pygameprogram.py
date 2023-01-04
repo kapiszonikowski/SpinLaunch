@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib as plt
 import matplotlib.pyplot as plt
 from pygame.locals import *
-from implementacja_wykresu import *
+from Impementacja_wykresu import *
 from constants import *
 from funkcje import *
 

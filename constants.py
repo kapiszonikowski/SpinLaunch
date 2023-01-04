@@ -18,8 +18,8 @@ jak_często = 100          #gęstość rozmieszczenia punktów - dla 100 pokazuj
 
 #zmienne----------------------------------------------------------------------------------------------------------------
 droga = 0                                           #zmienna drogi
-v_x0 = 100                                         #prędkość początkowa y
-v_y0 = 2000                                         #prędkość początkowa y
+v_x0 = 0                                        #prędkość początkowa y
+v_y0 = 0                                        #prędkość początkowa y
 X_location = x_0                                    #zmienna położenia x
 Y_location = y_0                                    #zmienna położenia y
 R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5   #odległość rakiety od środka ziemi
@@ -32,7 +32,7 @@ spin = 1
 m_r = m_r_p     #zmienna masa rakiety
 m_p = 600        #masa paliwa
 Dm_1s = m_p / 150   #paliwo tracone w czasie 1 s
-
+test = 0
 #Listy------------------------------------------------------------------------------------------------------------------
 x_forplot, x1_forplot  = [X_location], [X_location]
 y_forplot, y1_forplot = [Y_location], [Y_location]

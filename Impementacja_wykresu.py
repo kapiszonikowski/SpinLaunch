@@ -49,8 +49,8 @@ def wyświetlanie_wykresów(orbita, dane, spin):
         ax.canvas.draw_idle()
         slider.on_changed(update)'''
 
-        figManager = plt.get_current_fig_manager()
-        figManager.window.showMaximized()
+        #figManager = plt.get_current_fig_manager()
+        #figManager.window.showMaximized()
         plt.show()
 
     if dane == 1:
@@ -119,6 +119,6 @@ def wyświetlanie_wykresów(orbita, dane, spin):
         ad = plt.subplot(414)
         cursor4 = Cursor(ad, horizOn=True, vertOn=True, linewidth=0.5, color='Black')
 
-        figManager = plt.get_current_fig_manager()
-        figManager.window.showMaximized()
+        #figManager = plt.get_current_fig_manager()
+        #figManager.window.showMaximized()
         plt.show()

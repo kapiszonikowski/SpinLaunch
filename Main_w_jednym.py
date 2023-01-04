@@ -541,8 +541,8 @@ def wyświetlanie_wykresów(orbita, dane, spin):
 spin = 1  # spin = 1 odpalamy spinlauncha
 if spin == 1:
 
-    v_x0 = 0
-    v_y0 = 0
+    v_x0 = 1000
+    v_y0 = 1800
     v_x = v_x0
     v_y = v_y0
     H_startu = 21

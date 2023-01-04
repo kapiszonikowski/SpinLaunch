@@ -280,7 +280,7 @@ def obliczenia_numeryczne(faza, p_important_values, wysokość, tryb_pracy_silni
                     a_t_y = 0
                 if a_t_x != 0 or a_t_y != 0:
                     test = 1
-                if v_x > V_1:  # to było o 1 tab do przodu
+                if v_x > V_1 and Hnpm > 8500:
                     break
 
             if tryb_pracy_silników == 2:
@@ -292,7 +292,7 @@ def obliczenia_numeryczne(faza, p_important_values, wysokość, tryb_pracy_silni
                 # pass
                 if a_t_x != 0 or a_t_y != 0:
                     test = 1
-                if v_x > V_1:  # to było o 1 tab do przodu
+                if v_x > V_1 and Hnpm > 85000:  # to było o 1 tab do przodu
                     break
 
             obliczanie_przyspieszenia(faza)
@@ -407,18 +407,19 @@ def clear():
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Cursor, Slider
 
-# Tworzenie tekstu-------------------------------------------------------------------------------------------------------
-nd = round((droga / 1000), 2)
-nw = round((max(listR_xy) - R_Z) / 1000, 2)
-napis_drogi = f'droga przebyta przez ciao: {nd}km'
-napis_wysokości = f'maksymalna wysokość ciała n.p.k: {nw}km'
-napis_prędkości = f'początkowe prędkości ciał [km/s]: Vx = {round(v_x0 / 1000, 2)} ; Vy = {round(v_y0 / 1000, 2)}'
-napis_paliwa = f'masa paliwa: {m_p}kg'
-napis_gazów = f'prędkość gazów wylotowych: {v_g}m\s'
-n = -0.8 * R_Z
+
 
 
 def wyświetlanie_wykresów(orbita, dane, spin):
+    # Tworzenie tekstu-------------------------------------------------------------------------------------------------------
+    nd = round((droga / 1000), 2)
+    nw = round((max(listR_xy) - R_Z) / 1000, 2)
+    napis_drogi = f'droga przebyta przez ciao: {nd}km'
+    napis_wysokości = f'maksymalna wysokość ciała n.p.k: {nw}km'
+    napis_prędkości = f'początkowe prędkości ciał [km/s]: Vx = {round(v_x0 / 1000, 2)} ; Vy = {round(v_y0 / 1000, 2)}'
+    napis_paliwa = f'masa paliwa: {m_p}kg'
+    napis_gazów = f'prędkość gazów wylotowych: {v_g}m\s'
+    n = -0.8 * R_Z
     if orbita == 1:
         # ax, ax1 = plt.subplots()
         n = -0.8 * R_Z
@@ -542,32 +543,32 @@ spin = 1  # spin = 1 odpalamy spinlauncha
 if spin == 1:
 
     v_x0 = 1000
-    v_y0 = 1800
+    v_y0 = 100
     v_x = v_x0
     v_y = v_y0
-    H_startu = 21
+    H_startu = 100000
     jak_często = 1
 
-    obliczenia_numeryczne(0, 0, wysokość=H_startu, tryb_pracy_silników=0)  # Silniki nie zadzaiłały
+    obliczenia_numeryczne(0, 0, wysokość=H_startu, tryb_pracy_silników=2)  # Silniki nie zadzaiłały
 
     reset_xyv()  # resetuje wartości po I przelocie
     print('a')
 
-    obliczenia_numeryczne(1, 1, wysokość=H_startu, tryb_pracy_silników=0)  # I faza ruchu - do odpalenia silników
+    obliczenia_numeryczne(1, 0, wysokość=H_startu, tryb_pracy_silników=2)  # I faza ruchu - do odpalenia silników
 
     print('a')
     if Hnpm > 0 and Hnpm < H_startu:
         update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1], v_xy_l[-1])
     print('a')
 
-    obliczenia_numeryczne(2, 1, wysokość=H_startu, tryb_pracy_silników=0)  # II faza ruchu - z silnikami
+    obliczenia_numeryczne(2, 1, wysokość=H_startu, tryb_pracy_silników=2)  # II faza ruchu - z silnikami
     print('a')
 
     if test == 1:
         update_important_values(x_forplot[1], y_forplot[1], droga_l[1], listH_xy[1], a_xy_l[1], v_xy_l[1])
         update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1], v_xy_l[-1])
         test = 0
-    obliczenia_numeryczne(3, 0, wysokość=H_startu, tryb_pracy_silników=0)  # III faza ruchu - po wyczerpaniu paliwa
+    obliczenia_numeryczne(3, 0, wysokość=H_startu, tryb_pracy_silników=2)  # III faza ruchu - po wyczerpaniu paliwa
 
     wyświetlanie_wykresów(1, 1, spin)  # 0 nie wyświetlam, 1 wyświetlam
 

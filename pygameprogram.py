@@ -245,6 +245,7 @@ def data_input():
                 pass
             print(v_x, v_y, v_x0, v_y0)
 
+
             if spin == 1:
                 obliczenia_numeryczne(0, 0, wysokość=H_startu)  # Silniki nie zadzaiłały
 

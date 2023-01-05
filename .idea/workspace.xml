@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b0cb2062-63ec-4555-bc22-49ec8b2c4cdf" name="Changes" comment="trzeba wyświetlić wykres">
+    <list default="true" id="b0cb2062-63ec-4555-bc22-49ec8b2c4cdf" name="Changes" comment="ostatni commit na dziś">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Main_w_jednym.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main_w_jednym.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pygameprogram_do_testow.py" beforeDir="false" afterPath="$PROJECT_DIR$/pygameprogram_do_testow.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -62,14 +61,22 @@
       <option name="project" value="LOCAL" />
       <updated>1672869805383</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="ostatni commit na dziś">
+      <created>1672872543379</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1672872543379</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="połączenie w jednym pliku, potrzebne dodanie więkrzej ilości okien + sprawdzenie, czy wyskakują błędy" />
     <MESSAGE value="połączenie w jednym pliku, potrzebne dodanie więkrzej ilości okien + sprawdzenie, czy wyskakują błędy1" />
     <MESSAGE value="trzeba wyświetlić wykres" />
-    <option name="LAST_COMMIT_MESSAGE" value="trzeba wyświetlić wykres" />
+    <MESSAGE value="ostatni commit na dziś" />
+    <option name="LAST_COMMIT_MESSAGE" value="ostatni commit na dziś" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

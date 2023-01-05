@@ -4,8 +4,6 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Cursor, Slider
-import time
-
 
 # Stałe------------------------------------------------------------------------------------------------------------------
 M_Z = 5.98 * 10 ** 24  # masa ziemi
@@ -49,7 +47,7 @@ listH_xy, listH_xy1 = [], []
 wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x = [], [], [], [], [], []
 v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly = [], [], [], [], [], [], [], [], []
 
-
+#funkcje do wykresu------------------------------------------------------------------------------------------------------
 def obliczanie_przyspieszenia(faza):
     global R_xy, v_x, X_location, Y_location, v_y, m_r, a_x, a_y, droga, Hnpm, a_t_x, a_t_y, a_x, jak_często
     if faza == 0:
@@ -69,63 +67,107 @@ def obliczanie_przyspieszenia(faza):
         if v_x > 0:
             a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_x,
                                                                                       m_m)  # x-acceleration update
-            d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
+
+            if Hnpm >= 100 and i % jak_często == 0:
+                d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
+
+            if Hnpm < 100:
+                d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
+
         else:
             a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_x,
                                                                                       m_m)  # x-acceleration update
-            d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
+            if Hnpm >= 100 and i % jak_często == 0:
+                d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
+
+            if Hnpm < 100:
+                d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
         if v_y > 0:
             a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_y,
                                                                                       m_m)  # x-acceleration update
-            d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
+            if Hnpm >= 100 and i % jak_często == 0:
+                d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
+
+            if Hnpm < 100:
+                d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
         else:
             a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_y,
                                                                                       m_m)  # y-acceleration update
-            d_a_ly.append(+drag_acceleration(R_xy, v_y, m_m))
+            if Hnpm >= 100 and i % jak_często == 0:
+                d_a_ly.append(drag_acceleration(R_xy, v_y, m_m))
 
+            if Hnpm < 100:
+                d_a_ly.append(drag_acceleration(R_xy, v_y, m_m))
     if faza == 2:
         if v_x > 0:
             a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_x,
-                                                                                      m_r) + a_t_x  # x-acceleration update
-            if i % jak_często == 0:
-                d_a_lx.append(-drag_acceleration(R_xy, v_x, m_r))
+                                                                                      m_m) + a_t_x  # x-acceleration update
+
+            if Hnpm >= 100 and i % jak_często == 0:
+                d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
+
+            if Hnpm < 100:
+                d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
+
         else:
             a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_x,
-                                                                                      m_r) + a_t_x  # x-acceleration update
-            if i % jak_często == 0:
-                d_a_lx.append(drag_acceleration(R_xy, v_x, m_r))
+                                                                                      m_m) + a_t_x # x-acceleration update
+            if Hnpm >= 100 and i % jak_często == 0:
+                d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
+
+            if Hnpm < 100:
+                d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
         if v_y > 0:
             a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_y,
-                                                                                      m_r) + a_t_y  # x-acceleration update
-            if i % jak_często == 0:
-                d_a_ly.append(-drag_acceleration(R_xy, v_y, m_r))
+                                                                                      m_m) + a_t_y # x-acceleration update
+            if Hnpm >= 100 and i % jak_często == 0:
+                d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
+
+            if Hnpm < 100:
+                d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
         else:
             a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_y,
-                                                                                      m_r) + a_t_y  # y-acceleration update
-            if i % jak_często == 0:
-                d_a_ly.append(drag_acceleration(R_xy, v_y, m_r))
+                                                                                      m_m) + a_t_y # y-acceleration update
+            if Hnpm >= 100 and i % jak_często == 0:
+                d_a_ly.append(drag_acceleration(R_xy, v_y, m_m))
+
+            if Hnpm < 100:
+                d_a_ly.append(drag_acceleration(R_xy, v_y, m_m))
     if faza == 3:
         if v_x > 0:
             a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_x,
-                                                                                      m_r)  # x-acceleration update
-            if i % jak_często == 0:
-                d_a_lx.append(-drag_acceleration(R_xy, v_x, m_r))
+                                                                                      m_m)  # x-acceleration update
+
+            if Hnpm >= 100 and i % jak_często == 0:
+                d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
+
+            if Hnpm < 100:
+                d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
+
         else:
             a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_x,
-                                                                                      m_r)  # x-acceleration update
-            if i % jak_często == 0:
-                d_a_lx.append(drag_acceleration(R_xy, v_x, m_r))
+                                                                                      m_m)  # x-acceleration update
+            if Hnpm >= 100 and i % jak_często == 0:
+                d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
+
+            if Hnpm < 100:
+                d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
         if v_y > 0:
             a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_y,
-                                                                                      m_r)  # x-acceleration update
-            if i % jak_często == 0:
-                d_a_ly.append(-drag_acceleration(R_xy, v_y, m_r))
+                                                                                      m_m)  # x-acceleration update
+            if Hnpm >= 100 and i % jak_często == 0:
+                d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
+
+            if Hnpm < 100:
+                d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
         else:
             a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_y,
-                                                                                      m_r)  # y-acceleration update
-            if i % jak_często == 0:
-                d_a_ly.append(drag_acceleration(R_xy, v_y, m_r))
+                                                                                      m_m)  # y-acceleration update
+            if Hnpm >= 100 and i % jak_często == 0:
+                d_a_ly.append(drag_acceleration(R_xy, v_y, m_m))
 
+            if Hnpm < 100:
+                d_a_ly.append(drag_acceleration(R_xy, v_y, m_m))
 
 def updates_appends(faza):
     global R_xy, jak_często, v_x, X_location, Y_location, v_y, m_r, droga, Hnpm, i, x_forplot, x1_forplot, y_forplot, y1_forplot, droga_l, listH_xy, listH_xy1, listR_xy, v_xy_l, v_x_l, v_y_l, a_xy_l, a_x_l, a_y_l
@@ -136,12 +178,23 @@ def updates_appends(faza):
         X_location = X_location + v_x * Dt + 0.5 * a_x * Dt ** 2  # x-location update
         Y_location = Y_location + v_y * Dt + 0.5 * a_y * Dt ** 2  # y-location update
 
-        x1_forplot.append(X_location)
-        y1_forplot.append(Y_location)
+        i += 1
 
         R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
         Hnpm = R_xy - R_Z
-        listH_xy1.append(Hnpm)
+
+        if Hnpm >= 100 and i % jak_często == 0:
+            x1_forplot.append(X_location)
+            y1_forplot.append(Y_location)
+            listH_xy1.append(Hnpm)
+
+        if Hnpm < 100:
+            x1_forplot.append(X_location)
+            y1_forplot.append(Y_location)
+
+            R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
+            Hnpm = R_xy - R_Z
+            listH_xy1.append(Hnpm)
 
     if faza == 1:
         v_x = v_x + a_x * Dt  # x-speed update
@@ -150,24 +203,44 @@ def updates_appends(faza):
         X_location = X_location + v_x * Dt + 0.5 * a_x * Dt ** 2  # x-location update
         Y_location = Y_location + v_y * Dt + 0.5 * a_y * Dt ** 2  # y-location update
 
-        x_forplot.append(X_location)
-        y_forplot.append(Y_location)
-
-        R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
-        droga = droga + ((x_forplot[-1] - x_forplot[-2]) ** 2 + (y_forplot[-1] - y_forplot[-2]) ** 2) ** 0.5
-        Hnpm = R_xy - R_Z
-
         i += 1
 
-        droga_l.append(droga)
-        listR_xy.append(R_xy)
-        listH_xy.append(Hnpm / 1000)
-        v_xy_l.append(v_xy(v_x, v_y))
-        v_x_l.append(v_x)
-        v_y_l.append((v_y))
-        a_y_l.append(a_y)
-        a_x_l.append(a_x)
-        a_xy_l.append(a_xy(a_x, a_y))
+        R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
+        Hnpm = R_xy - R_Z
+
+        if Hnpm >= 100 and i % jak_często == 0:
+            x_forplot.append(X_location)
+            y_forplot.append(Y_location)
+
+            droga = droga + ((x_forplot[-1] - x_forplot[-2]) ** 2 + (y_forplot[-1] - y_forplot[-2]) ** 2) ** 0.5
+
+            listR_xy.append(R_xy)
+            listH_xy.append(Hnpm / 1000)
+            v_xy_l.append(v_xy(v_x, v_y))
+            v_x_l.append((v_x))
+            v_y_l.append((v_y))
+            droga_l.append(droga)
+            a_y_l.append(a_y)
+            a_x_l.append(a_x)
+            a_xy_l.append(a_xy(a_x, a_y))
+
+        if Hnpm < 100:
+            x_forplot.append(X_location)
+            y_forplot.append(Y_location)
+
+            R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
+            droga = droga + ((x_forplot[-1] - x_forplot[-2]) ** 2 + (y_forplot[-1] - y_forplot[-2]) ** 2) ** 0.5
+            Hnpm = R_xy - R_Z
+
+            listR_xy.append(R_xy)
+            listH_xy.append(Hnpm / 1000)
+            v_xy_l.append(v_xy(v_x, v_y))
+            v_x_l.append((v_x))
+            v_y_l.append((v_y))
+            droga_l.append(droga)
+            a_y_l.append(a_y)
+            a_x_l.append(a_x)
+            a_xy_l.append(a_xy(a_x, a_y))
 
     if faza == 2:
         v_x = v_x + a_x * Dt  # x-speed update
@@ -178,7 +251,26 @@ def updates_appends(faza):
 
         i += 1
 
-        if i % jak_często == 0:
+        R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
+        Hnpm = R_xy - R_Z
+
+        if Hnpm >= 100 and i % jak_często == 0:
+            x_forplot.append(X_location)
+            y_forplot.append(Y_location)
+
+            droga = droga + ((x_forplot[-1] - x_forplot[-2]) ** 2 + (y_forplot[-1] - y_forplot[-2]) ** 2) ** 0.5
+
+            listR_xy.append(R_xy)
+            listH_xy.append(Hnpm / 1000)
+            v_xy_l.append(v_xy(v_x, v_y))
+            v_x_l.append((v_x))
+            v_y_l.append((v_y))
+            droga_l.append(droga)
+            a_y_l.append(a_y)
+            a_x_l.append(a_x)
+            a_xy_l.append(a_xy(a_x, a_y))
+
+        if Hnpm < 100:
             x_forplot.append(X_location)
             y_forplot.append(Y_location)
 
@@ -205,7 +297,26 @@ def updates_appends(faza):
 
         i += 1
 
-        if i % jak_często == 0:
+        R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
+        Hnpm = R_xy - R_Z
+
+        if Hnpm >= 100 and i % jak_często == 0:
+            x_forplot.append(X_location)
+            y_forplot.append(Y_location)
+
+            droga = droga + ((x_forplot[-1] - x_forplot[-2]) ** 2 + (y_forplot[-1] - y_forplot[-2]) ** 2) ** 0.5
+
+            listR_xy.append(R_xy)
+            listH_xy.append(Hnpm / 1000)
+            v_xy_l.append(v_xy(v_x, v_y))
+            v_x_l.append((v_x))
+            v_y_l.append((v_y))
+            droga_l.append(droga)
+            a_y_l.append(a_y)
+            a_x_l.append(a_x)
+            a_xy_l.append(a_xy(a_x, a_y))
+
+        if Hnpm < 100:
             x_forplot.append(X_location)
             y_forplot.append(Y_location)
 
@@ -222,7 +333,6 @@ def updates_appends(faza):
             a_y_l.append(a_y)
             a_x_l.append(a_x)
             a_xy_l.append(a_xy(a_x, a_y))
-
 
 def naprowadzanie_na_orbite():
     global R_xy, v_x, X_location, Y_location, v_y, m_r, a_x, a_y, droga, Hnpm, a_t_x, a_t_y, a_x, test
@@ -241,7 +351,6 @@ def naprowadzanie_na_orbite():
     if a_t_x != 0 or a_t_y != 0:
         test = 1
     return a_t_x, a_t_y
-
 
 def obliczenia_numeryczne(faza, p_important_values, wysokość, tryb_pracy_silników):
     global R_xy, X_location, Y_location, m_r, a_x, a_y, droga, Hnpm, a_t_x, a_t_y, a_x, H_startu, jak_często, test
@@ -321,10 +430,8 @@ def obliczenia_numeryczne(faza, p_important_values, wysokość, tryb_pracy_silni
             if p_important_values == 1:
                 print_important_values()
 
-
 def prędkość_kosmiczna(R):
     return np.sqrt(G * M_Z / R)
-
 
 def air_density(R_xy):  # air density formula
     if R_xy < R_Z + 100000:
@@ -332,34 +439,26 @@ def air_density(R_xy):  # air density formula
     else:
         return 0
 
-
 def drag_acceleration(R_xy, speed, mr):  # drag from the height and air density
     return 0.5 * air_density(R_xy) * S * speed ** 2 * f / mr
-
 
 def cos(x, y):
     return y / np.sqrt(x ** 2 + y ** 2)
 
-
 def sin(x, y):
     return x / np.sqrt(x ** 2 + y ** 2)
-
 
 def D_osi(p1, p0):
     return p1 - p0
 
-
 def przemieszczenie(x1, x0, y1, y0):
     return ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
-
 
 def thrust_acceleration(x1, x0, y1, y0):
     return 1 / przemieszczenie(x1, x0, y1, y0) * (v_g * Dm_1s + 0.01 * S * 10 * air_density(R_xy)) / m_r
 
-
 def thrust_acceleration1():
     return (v_g * Dm_1s + 0.01 * S * 10 * air_density(R_xy)) / m_r
-
 
 def update_important_values(x, y, d, h, a, v):
     wazny_x.append(x)
@@ -369,14 +468,11 @@ def update_important_values(x, y, d, h, a, v):
     wazny_a.append(a)
     wazny_v.append(v)
 
-
 def v_xy(vx, vy):
     return (vx ** 2 + vy ** 2) ** 0.5
 
-
 def a_xy(ax, ay):
     return (ax ** 2 + ay ** 2) ** 0.5
-
 
 def print_important_values():
     try:
@@ -388,7 +484,6 @@ def print_important_values():
         print(
             f'Location (x,y): {[round(X_location, 0), round(Y_location)]}[m] || H: {Hnpm}[m] ||  t: {round(i / 3600000, 2)}[s]')
 
-
 def reset_xyv():
     global v_x, v_y, X_location, Y_location, R_xy, v_x0, v_y0, x_0, y_0, Hnpm, R_Z
     v_x = v_x0
@@ -398,19 +493,19 @@ def reset_xyv():
     R_xy = y_0
     Hnpm = R_xy - R_Z
 
-
 def clear():
-    global wazny_h, x_forplot, x1_forplot, y_forplot, y1_forplot, droga_l, listH_xy, listH_xy1, listR_xy, v_xy_l, v_x_l, v_y_l, a_xy_l, a_x_l, a_y_l
+    global wazny_h, x_forplot, x1_forplot, y_forplot, y1_forplot, droga_l, listH_xy, listH_xy1, listR_xy, v_xy_l, v_x_l, v_y_l, a_xy_l, a_x_l, a_y_l, droga, i
 
-    x_forplot, x1_forplot = [X_location], [X_location]
-    y_forplot, y1_forplot = [Y_location], [Y_location]
+    x_forplot, x1_forplot = [x_0], [x_0]
+    y_forplot, y1_forplot = [y_0], [y_0]
     listR_xy = [R_xy]  # potrzebne? -> TAK
     listH_xy, listH_xy1 = [], []
     wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x = [], [], [], [], [], []
     v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly = [], [], [], [], [], [], [], [], []
+    droga = 0
+    i = 0
 
 def wyświetlanie_wykresów(orbita, dane):
-
     # Tworzenie tekstu-------------------------------------------------------------------------------------------------------
     nd = round((droga / 1000), 2)
     nw = round((max(listR_xy) - R_Z) / 1000, 2)
@@ -431,7 +526,8 @@ def wyświetlanie_wykresów(orbita, dane):
         plt.xlim(-2 * R_Z, 2 * R_Z)
         plt.ylim(-2 * R_Z, 2 * R_Z)
         theta = np.arange(0, np.pi * 2, 0.01)
-        plt.plot((R_Z+23.3) * np.cos(theta), (R_Z+23.3) * np.sin(theta), lw=2, color='b', label='Ziemia')  # model ziemi
+        plt.plot((R_Z + 23.3) * np.cos(theta), (R_Z + 23.3) * np.sin(theta), lw=2, color='b',
+                 label='Ziemia')  # model ziemi
         plt.plot((R_Z + 85000) * np.cos(theta), (R_Z + 85000) * np.sin(theta), color='y', lw=0.3)
         try:
             plt.scatter(wazny_x, wazny_y)  # początak i start działania silników
@@ -458,8 +554,8 @@ def wyświetlanie_wykresów(orbita, dane):
         ax.canvas.draw_idle()
         slider.on_changed(update)'''
 
-        # figManager = plt.get_current_fig_manager()
-        # figManager.window.showMaximized()
+        #figManager = plt.get_current_fig_manager()
+        #figManager.window.showMaximized()
         plt.show()
         print('jaaa')
 
@@ -529,10 +625,9 @@ def wyświetlanie_wykresów(orbita, dane):
         ad = plt.subplot(414)
         cursor4 = Cursor(ad, horizOn=True, vertOn=True, linewidth=0.5, color='Black')
 
-        # figManager = plt.get_current_fig_manager()
-        # figManager.window.showMaximized()
+        #figManager = plt.get_current_fig_manager()
+        #figManager.window.showMaximized()
         plt.show()
-
 
 pygame.init()
 
@@ -542,66 +637,23 @@ clock = pygame.time.Clock()
 # Create the screen
 screen_width = 1520
 screen_height = 800
-screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
-#screen = pygame.display.set_mode([1520,800])
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+# screen = pygame.display.set_mode([1520,800])
 pygame.display.set_caption("spinlaunch")
 
 # zmienne
 font = pygame.font.SysFont("comicsansms", 30)
-smallfont = pygame.font.SysFont("comicsansms",20)
+smallfont = pygame.font.SysFont("comicsansms", 20)
 titlefont = pygame.font.SysFont('timesnewroman', 50)
 slategrey = (112, 128, 144)
 lightgrey = (165, 175, 185)
 blackish = (10, 10, 10)
 white = (255, 255, 255)
 black = (0, 0, 0)
-#-----------------------------------------------------------------------------------------------------------------------
-'''M_Z = 5.98 * 10 ** 24  # masa ziemi
-R_Z = 6371000  # promień ziemi
-G = 6.6743 * 10 ** (-11)  # stała grawitacyjna
-V_1 = np.sqrt(G * M_Z / R_Z)  # I prędkośćkosmiczna
-x_0 = 0  # pocztkowy x
-y_0 = R_Z + 20  # pocztkowy y
-k = G * M_Z  # wsp staej grawitacji
-Dt = 0.01  # czas aktualizacji
-# alpha = nu.angle(0, deg=True)
-f = 0.125  # Drag coefficient for rocket
-S = np.pi * 0.5 ** 2  # Rocket cross-section
-m_m = 10300  # masa całego modułu
-v_g = 8750  # prędkość gazów wylotowych
-m_r_p = 1000  # początkowa masa rakiety
-jak_często = 100  # gęstość rozmieszczenia punktów - dla 100 pokazuje lokalizacje co 1s
- # zmienne----------------------------------------------------------------------------------------------------------------
-droga = 0  # zmienna drogi
-v_x0 = 1000  # prędkość początkowa y
-v_y0 = 1800  # prędkość początkowa y
-X_location = x_0  # zmienna położenia x
-Y_location = y_0  # zmienna położenia y
-R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5  # odległość rakiety od środka ziemi
-Hnpm = R_xy - R_Z  # wysokość npm
-v_x = v_x0  # zmienna prędkości x
-v_y = v_y0  # zmienna prędkości y
-H_startu = 100000
-i = 0  # ilość punktów
-spin = 0
-m_r = m_r_p  # zmienna masa rakiety
-m_p = 600  # masa paliwa
-Dm_1s = m_p / 150  # paliwo tracone w czasie 1 s
-test = 0
-# Listy------------------------------------------------------------------------------------------------------------------
-x_forplot, x1_forplot = [X_location], [X_location]
-y_forplot, y1_forplot = [Y_location], [Y_location]
-listR_xy = [R_xy]  # potrzebne? -> TAK
-listH_xy, listH_xy1 = [], []
-wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x = [], [], [], [], [], []
-v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly = [], [], [], [], [], [], [], [], []'''
-
 
 # obrazy----------------------------------------------------------------------------------------------------------------
 spinlaunchImg = pygame.image.load("SpinLaunch.logo.jpg")
 earthImg = pygame.image.load('earth.jpg')
-
-# z maina --------------------------------------------------------------------------------------------------------------
 
 # funkcja przycisku ----------------------------------------------------------------------------------------------------
 def create_button(x, y, width, height, hovercolor, defaultcolor):
@@ -614,14 +666,14 @@ def create_button(x, y, width, height, hovercolor, defaultcolor):
     else:
         pygame.draw.rect(screen, defaultcolor, (x, y, width, height))
 
-#wyswietlanie wykresu---------------------------------------------------------------------------------------------------
+# wyswietlanie wykresu---------------------------------------------------------------------------------------------------
 def plot_display(a, b):
     x = np.linspace(0, 2 * np.pi, 100)
     y = (np.sin(a * x) ** b)
     plt.plot(x, y, color='g', lw=1, label='sin(a*x)')
     plt.show()
 
-#ekran 1. --------------------------------------------------------------------------------------------------------------
+# ekran 1. --------------------------------------------------------------------------------------------------------------
 def intro():
     title = titlefont.render("Projekt Spinlaunch", True, slategrey)
 
@@ -637,9 +689,9 @@ def intro():
             menu()
 
         startbuttontext = titlefont.render("Start", True, blackish)
-        screen.blit(startbuttontext, ((screen_width/2 - 50), 725))
+        screen.blit(startbuttontext, ((screen_width / 2 - 50), 725))
 
-        screen.blit(spinlaunchImg, ((screen_width - spinlaunchImg.get_width())/2, 300))
+        screen.blit(spinlaunchImg, ((screen_width - spinlaunchImg.get_width()) / 2, 300))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -654,7 +706,8 @@ def intro():
         clock.tick(15)
         return True
 
-#menu glowne------------------------------------------------------------------------------------------------------------
+
+# menu glowne------------------------------------------------------------------------------------------------------------
 def menu():
     instruction = font.render("wybierz opcje: program-wprowadzanie danych, teoria - wiecej o zjawisku", True, slategrey)
     programText = font.render("PROGRAM", True, blackish)
@@ -665,7 +718,8 @@ def menu():
         screen.blit(earthImg, (0, 0))
         screen.blit(instruction, ((screen_width - instruction.get_width()) / 2, 0))
 
-        programButtton = create_button((screen_width / 2) - 100, int(screen_height * .33), 200, 50, lightgrey, slategrey)
+        programButtton = create_button((screen_width / 2) - 100, int(screen_height * .33), 200, 50, lightgrey,
+                                       slategrey)
 
         if programButtton:
             data_input()
@@ -688,11 +742,11 @@ def menu():
                     pygame.quit()
                     sys.exit()
 
-
         pygame.display.update()
         clock.tick(15)
 
-#wprowadzanie danych----------------------------------------------------------------------------------------------------
+
+# wprowadzanie danych----------------------------------------------------------------------------------------------------
 def data_input():
     global test, R_xy, v_x0, v_y0, jak_często, v_x, X_location, Y_location, v_y, m_r, droga, Hnpm, i, x_forplot, x1_forplot, y_forplot, y1_forplot, droga_l, listH_xy, listH_xy1, listR_xy, v_xy_l, v_x_l, v_y_l, a_xy_l, a_x_l, a_y_l
 
@@ -711,19 +765,17 @@ def data_input():
 
         v_xSurface = font.render(vv_x, True, white)
 
-        v_xBorder = pygame.Rect(((screen_width - v_xSurface.get_width()) / 2) - 10, screen_height * .20, v_xSurface.get_width() + 10, 50)
+        v_xBorder = pygame.Rect(((screen_width - v_xSurface.get_width()) / 2) - 10, screen_height * .20,
+                                v_xSurface.get_width() + 10, 50)
 
         screen.blit(v_xSurface, ((screen_width - v_xSurface.get_width()) / 2, screen_height * .20))
-
 
         v_ySurface = font.render(vv_y, True, white)
 
         v_yBorder = pygame.Rect(((screen_width - v_ySurface.get_width()) / 2) - 10, screen_height - 500,
-                                      v_ySurface.get_width() + 10, 50)
+                                v_ySurface.get_width() + 10, 50)
 
         screen.blit(v_ySurface, ((screen_width - v_ySurface.get_width()) / 2, screen_height - 500))
-
-
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -734,8 +786,6 @@ def data_input():
                     pygame.quit()
                     sys.exit()
 
-
-
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if v_xBorder.collidepoint(event.pos):
                     v_xActive = True
@@ -743,7 +793,6 @@ def data_input():
                 if v_yBorder.collidepoint(event.pos):
                     v_yActive = True
                     v_xActive = False
-
 
             if event.type == pygame.KEYDOWN:
                 if v_xActive:
@@ -775,12 +824,12 @@ def data_input():
             v_yPrompt = font.render("podaj v_y", True, slategrey)
 
         screen.blit(v_xPrompt, ((screen_width - v_xPrompt.get_width()) / 2,
-                                     (screen_height * .20) + v_xSurface.get_height()))
+                                (screen_height * .20) + v_xSurface.get_height()))
         screen.blit(v_yPrompt, ((screen_width - v_yPrompt.get_width()) / 2,
-                                     (screen_height -500) + v_ySurface.get_height()))
+                                (screen_height - 500) + v_ySurface.get_height()))
 
         readyButtton = create_button((screen_width / 2) - (ready.get_width() / 2) - 200, screen_height * .9,
-                                      ready.get_width() + 10, ready.get_height(), lightgrey, slategrey)
+                                     ready.get_width() + 10, ready.get_height(), lightgrey, slategrey)
 
         screen.blit(ready, ((screen_width / 2) - (ready.get_width() / 2) - 195, int(screen_height * .9)))
 
@@ -798,36 +847,27 @@ def data_input():
             if spin == 1:
 
                 H_startu = 100000
-                jak_często = 1
+                jak_często = 100
 
-                obliczenia_numeryczne(0, 1, wysokość=H_startu, tryb_pracy_silników=2)  # Silniki nie zadzaiłały
+                obliczenia_numeryczne(0, 0, wysokość=H_startu, tryb_pracy_silników=0)  # Silniki nie zadzaiłały
 
                 reset_xyv()  # resetuje wartości po I przelocie
-                print('a')
 
-                obliczenia_numeryczne(1, 1, wysokość=H_startu,
-                                      tryb_pracy_silników=2)  # I faza ruchu - do odpalenia silników
+                obliczenia_numeryczne(1, 0, wysokość=H_startu,
+                                                        tryb_pracy_silników=0)  # I faza ruchu - do odpalenia silników
 
-                print('a')
-
-                obliczenia_numeryczne(2, 1, wysokość=H_startu, tryb_pracy_silników=2)  # II faza ruchu - z silnikami
-                print('a')
+                obliczenia_numeryczne(2, 0, wysokość=H_startu, tryb_pracy_silników=0)  # II faza ruchu - z silnikami
 
                 if test == 1:
                     update_important_values(x_forplot[0], y_forplot[0], droga_l[0], listH_xy[0], a_xy_l[0], v_xy_l[0])
                     update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1],
                                             v_xy_l[-1])
                     test = 0
-                print('a')
+
                 obliczenia_numeryczne(3, 0, wysokość=H_startu,
-                                      tryb_pracy_silników=2)  # III faza ruchu - po wyczerpaniu paliwa
-                print('a')
-                print(x1_forplot)
-                print(d_a_ly)
+                                      tryb_pracy_silników=0)  # III faza ruchu - po wyczerpaniu paliwa
 
-
-                #wyświetlanie_wykresów(1, 1)  # 0 nie wyświetlam, 1 wyświetlam
-                print('a')
+                wyświetlanie_wykresów(1, 1)  # 0 nie wyświetlam, 1 wyświetlam
 
             if spin != 1:
                 test = 1
@@ -933,7 +973,7 @@ def data_input():
                                             v_xy_l[-1])
 
                 obliczenia_numeryczne(2, 0, wysokość=H_startu, tryb_pracy_silników=tryb)  # II faza ruchu - z silnikami
-                print(droga_l)
+
                 if Hnpm > H_startu:
                     update_important_values(x_forplot[1], y_forplot[1], droga_l[1], listH_xy[1], a_xy_l[1], v_xy_l[1])
 
@@ -943,17 +983,17 @@ def data_input():
 
                 obliczenia_numeryczne(3, 0, wysokość=H_startu,
                                       tryb_pracy_silników=tryb)  # III faza ruchu - po wyczerpaniu paliwa
-                print(droga_l)
+
 
                 wyświetlanie_wykresów(0, 1)  # 0 nie wyświetlam, 1 wyświetlam
 
             clear()
-            powrot(1,1)
+            powrot()
         pygame.display.update()
         clock.tick(15)
 
 
-#o spinlaunchu----------------------------------------------------------------------------------------------------------
+# o spinlaunchu----------------------------------------------------------------------------------------------------------
 def spinlaunch_info():
     title_text = font.render("O spinlaunchu", True, slategrey)
 
@@ -963,7 +1003,6 @@ def spinlaunch_info():
         screen.fill((0, 0, 0))
         screen.blit(title_text, ((screen_width - title_text.get_width()) / 2, 0))
         screen.blit(spinlaunchImg, ((screen_width - spinlaunchImg.get_width()) / 2, 300))
-
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -975,7 +1014,7 @@ def spinlaunch_info():
                     sys.exit()
 
         nextButtton = create_button((screen_width / 2) - (next.get_width() / 2) - 5, screen_height * .9,
-                                     next.get_width() + 10, next.get_height(), lightgrey, slategrey)
+                                    next.get_width() + 10, next.get_height(), lightgrey, slategrey)
 
         screen.blit(next, ((screen_width / 2) - (next.get_width() / 2), int(screen_height * .9)))
 
@@ -985,7 +1024,7 @@ def spinlaunch_info():
         pygame.display.update()
         clock.tick(15)
 
-#jak wyslac satelite----------------------------------------------------------------------------------------------------
+# jak wyslac satelite----------------------------------------------------------------------------------------------------
 def teoria():
     title_text = font.render("teoria", True, slategrey)
 
@@ -1008,7 +1047,7 @@ def teoria():
         nextButtton = create_button((screen_width / 2) - (next.get_width() / 2) + 195, screen_height * .9,
                                     next.get_width() + 10, next.get_height(), lightgrey, slategrey)
 
-        screen.blit(next, ((screen_width / 2) - (next.get_width() / 2)+200, int(screen_height * .9)))
+        screen.blit(next, ((screen_width / 2) - (next.get_width() / 2) + 200, int(screen_height * .9)))
 
         if nextButtton:
             parametry()
@@ -1046,7 +1085,8 @@ def parametry():
         pygame.display.update()
         clock.tick(15)
 
-def plot(a,b):
+'''
+def plot(a, b):
     matplotlib.use("Agg")
     import matplotlib.backends.backend_agg as agg
     import pylab
@@ -1054,7 +1094,7 @@ def plot(a,b):
     fig = pylab.figure(figsize=[6, 6], dpi=100)
     ax = fig.gca()
     x = np.linspace(0, 2 * np.pi, 100)
-    y = (np.sin(a*x))**b
+    y = (np.sin(a * x)) ** b
     ax.plot(x, y, color='g', lw=1, label='sin(a*x)')
 
     canvas = agg.FigureCanvasAgg(fig)
@@ -1077,19 +1117,20 @@ def plot(a,b):
             if event.type == pygame.QUIT:
                 crashed = True
             if event.type == pygame.KEYDOWN:
-                if event.key==pygame.K_ESCAPE:
+                if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
+'''
 
-#pytanie o powrót
-def powrot(a, b):
-    matplotlib.use('TkAgg')
+# pytanie o powrót
+def powrot():
+    #matplotlib.use('TkAgg')
     instruction = font.render("wybierz opcje: ", True, slategrey)
     backText = font.render("POWROT DO WPROWADZANIA ZMIENNYCH", True, blackish)
-    plotText = font.render("WYJSCIE Z PROGRAMU I WYSWIETLENIE WYKRESU W MATPLOTLIB", True, blackish)
+    plotText = font.render("WYJSCIE Z PROGRAMU", True, blackish)
 
     running = True
-    while(running):
+    while (running):
         screen.fill((0, 0, 0))
         screen.blit(earthImg, (0, 0))
         screen.blit(instruction, ((screen_width - instruction.get_width()) / 2, 0))
@@ -1104,12 +1145,9 @@ def powrot(a, b):
         plotButtton = create_button((screen_width / 2) - 100, screen_height / 2, 200, 50, lightgrey, slategrey)
 
         if plotButtton:
-            #running = False
-            #pygame.display.quit()
-            plot_display(a, b)
-            pygame.display.init()
-            pygame.display.flip()
-            #main_loop1()
+            pygame.quit()
+            sys.exit()
+
 
         screen.blit(plotText, ((screen_width / 2) - (backText.get_width() / 2), screen_height / 2))
 
@@ -1124,19 +1162,17 @@ def powrot(a, b):
         pygame.display.flip()
         clock.tick(60)
 
-
-#pętla glowna-----------------------------------------------------------------------------------------------------------
+# pętla glowna-----------------------------------------------------------------------------------------------------------
 def oknowyboru():
-    pygame.display.set_mode((1520,800))
+    pygame.display.set_mode((1520, 800))
     pygame.display.set_caption('okno wyboru')
-    running=True
-    while(running):
+    running = True
+    while (running):
         intro()
         for event in pygame.event.get():
-            if event.type==pygame.QUIT:
-                running=False
+            if event.type == pygame.QUIT:
+                running = False
                 pygame.display.quit()
-
 
 pygame.init()
 oknowyboru()

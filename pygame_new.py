@@ -1,7 +1,6 @@
 import sys
 import pygame
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Cursor, Slider
 
@@ -11,7 +10,8 @@ R_Z = 6371000  # promień ziemi
 G = 6.6743 * 10 ** (-11)  # stała grawitacyjna
 V_1 = np.sqrt(G * M_Z / R_Z)  # I prędkośćkosmiczna
 x_0 = 0  # pocztkowy x
-y_0 = R_Z + 20  # pocztkowy y
+y_00 = 20
+y_0 = R_Z + y_00  # pocztkowy y
 k = G * M_Z  # wsp staej grawitacji
 Dt = 0.01  # czas aktualizacji
 # alpha = nu.angle(0, deg=True)
@@ -22,26 +22,29 @@ v_g = 8750  # prędkość gazów wylotowych
 m_r_p = 1000  # początkowa masa rakiety
 jak_często = 100  # gęstość rozmieszczenia punktów - dla 100 pokazuje lokalizacje co 1s
 tryb_pracy_silników = 0
+v_x0 = 1000  # prędkość początkowa y
+v_y0 = 1800  # prędkość początkowa y
+m_p0 = 600  # masa paliwa
+H_startu = 100000
 
 # zmienne----------------------------------------------------------------------------------------------------------------
 droga = 0  # zmienna drogi
-v_x0 = 1000  # prędkość początkowa y
-v_y0 = 1800  # prędkość początkowa y
 X_location = x_0  # zmienna położenia x
 Y_location = y_0  # zmienna położenia y
 R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5  # odległość rakiety od środka ziemi
 Hnpm = R_xy - R_Z  # wysokość npm
 v_x = v_x0  # zmienna prędkości x
 v_y = v_y0  # zmienna prędkości y
-H_startu = 100000
 i = 0  # ilość punktów
 spin = 0
 m_r = m_r_p  # zmienna masa rakiety
-m_p0 = 600  # masa paliwa
 m_p = m_p0
-Dm_1s = m_p0 / 150  # paliwo tracone w czasie 1 s
+Dm_1s = m_p / 150  # paliwo tracone w czasie 1 s
 test = 0
 test1 = 0
+czy_faza1 = 0
+czy_faza2 = 0
+czy_faza3 = 0
 
 # Listy------------------------------------------------------------------------------------------------------------------
 x_forplot, x1_forplot = [X_location], [X_location]
@@ -72,105 +75,105 @@ def obliczanie_przyspieszenia(faza):
             a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_x,
                                                                                       m_m)  # x-acceleration update
 
-            if Hnpm >= 100 and i % jak_często == 0:
+            if Hnpm >= 1000 and i % jak_często == 0:
                 d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
 
-            if Hnpm < 100:
+            if Hnpm < 1000:
                 d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
 
         else:
             a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_x,
                                                                                       m_m)  # x-acceleration update
-            if Hnpm >= 100 and i % jak_często == 0:
+            if Hnpm >= 1000 and i % jak_często == 0:
                 d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
 
-            if Hnpm < 100:
+            if Hnpm < 1000:
                 d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
         if v_y > 0:
             a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_y,
                                                                                       m_m)  # x-acceleration update
-            if Hnpm >= 100 and i % jak_często == 0:
+            if Hnpm >= 1000 and i % jak_często == 0:
                 d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
 
-            if Hnpm < 100:
+            if Hnpm < 1000:
                 d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
         else:
             a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_y,
                                                                                       m_m)  # y-acceleration update
-            if Hnpm >= 100 and i % jak_często == 0:
+            if Hnpm >= 1000 and i % jak_często == 0:
                 d_a_ly.append(drag_acceleration(R_xy, v_y, m_m))
 
-            if Hnpm < 100:
+            if Hnpm < 1000:
                 d_a_ly.append(drag_acceleration(R_xy, v_y, m_m))
     if faza == 2:
         if v_x > 0:
             a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_x,
                                                                                       m_m) + a_t_x  # x-acceleration update
 
-            if Hnpm >= 100 and i % jak_często == 0:
+            if Hnpm >= 1000 and i % jak_często == 0:
                 d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
 
-            if Hnpm < 100:
+            if Hnpm < 1000:
                 d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
 
         else:
             a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_x,
                                                                                       m_m) + a_t_x # x-acceleration update
-            if Hnpm >= 100 and i % jak_często == 0:
+            if Hnpm >= 1000 and i % jak_często == 0:
                 d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
 
-            if Hnpm < 100:
+            if Hnpm < 1000:
                 d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
         if v_y > 0:
             a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_y,
                                                                                       m_m) + a_t_y # x-acceleration update
-            if Hnpm >= 100 and i % jak_często == 0:
+            if Hnpm >= 1000 and i % jak_często == 0:
                 d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
 
-            if Hnpm < 100:
+            if Hnpm < 1000:
                 d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
         else:
             a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_y,
                                                                                       m_m) + a_t_y # y-acceleration update
-            if Hnpm >= 100 and i % jak_często == 0:
+            if Hnpm >= 1000 and i % jak_często == 0:
                 d_a_ly.append(drag_acceleration(R_xy, v_y, m_m))
 
-            if Hnpm < 100:
+            if Hnpm < 1000:
                 d_a_ly.append(drag_acceleration(R_xy, v_y, m_m))
     if faza == 3:
         if v_x > 0:
             a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_x,
                                                                                       m_m)  # x-acceleration update
 
-            if Hnpm >= 100 and i % jak_często == 0:
+            if Hnpm >= 1000 and i % jak_często == 0:
                 d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
 
-            if Hnpm < 100:
+            if Hnpm < 1000:
                 d_a_lx.append(-drag_acceleration(R_xy, v_x, m_m))
 
         else:
             a_x = -k * sin(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_x,
                                                                                       m_m)  # x-acceleration update
-            if Hnpm >= 100 and i % jak_często == 0:
+            if Hnpm >= 1000 and i % jak_często == 0:
                 d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
 
-            if Hnpm < 100:
+            if Hnpm < 1000:
                 d_a_lx.append(drag_acceleration(R_xy, v_x, m_m))
         if v_y > 0:
             a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) - drag_acceleration(R_xy, v_y,
                                                                                       m_m)  # x-acceleration update
-            if Hnpm >= 100 and i % jak_często == 0:
+            if Hnpm >= 1000 and i % jak_często == 0:
                 d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
 
-            if Hnpm < 100:
+            if Hnpm < 1000:
                 d_a_ly.append(-drag_acceleration(R_xy, v_y, m_m))
         else:
             a_y = -k * cos(X_location, Y_location) * R_xy ** (-2) + drag_acceleration(R_xy, v_y,
                                                                                       m_m)  # y-acceleration update
-            if Hnpm >= 100 and i % jak_często == 0:
+            if Hnpm >= 1000 and i % jak_często == 0:
                 d_a_ly.append(drag_acceleration(R_xy, v_y, m_m))
 
-            if Hnpm < 100:
+            if Hnpm < 1000:
                 d_a_ly.append(drag_acceleration(R_xy, v_y, m_m))
 
 def updates_appends(faza):
@@ -188,12 +191,12 @@ def updates_appends(faza):
         Hnpm = R_xy - R_Z
 
 
-        if Hnpm >= 100 and i % jak_często == 0:
+        if Hnpm >= 1000 and i % jak_często == 0:
             x1_forplot.append(X_location)
             y1_forplot.append(Y_location)
             listH_xy1.append(Hnpm)
 
-        if Hnpm < 100:
+        if Hnpm < 1000:
             x1_forplot.append(X_location)
             y1_forplot.append(Y_location)
 
@@ -213,7 +216,7 @@ def updates_appends(faza):
         R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
         Hnpm = R_xy - R_Z
 
-        if Hnpm >= 100 and i % jak_często == 0:
+        if Hnpm >= 1000 and i % jak_często == 0:
             x_forplot.append(X_location)
             y_forplot.append(Y_location)
 
@@ -222,14 +225,14 @@ def updates_appends(faza):
             listR_xy.append(R_xy)
             listH_xy.append(Hnpm / 1000)
             v_xy_l.append(v_xy(v_x, v_y))
-            v_x_l.append((v_x))
-            v_y_l.append((v_y))
+            v_x_l.append(v_x)
+            v_y_l.append(v_y)
             droga_l.append(droga)
             a_y_l.append(a_y)
             a_x_l.append(a_x)
             a_xy_l.append(a_xy(a_x, a_y))
 
-        if Hnpm < 100:
+        if Hnpm < 1000:
             x_forplot.append(X_location)
             y_forplot.append(Y_location)
 
@@ -240,8 +243,8 @@ def updates_appends(faza):
             listR_xy.append(R_xy)
             listH_xy.append(Hnpm / 1000)
             v_xy_l.append(v_xy(v_x, v_y))
-            v_x_l.append((v_x))
-            v_y_l.append((v_y))
+            v_x_l.append(v_x)
+            v_y_l.append(v_y)
             droga_l.append(droga)
             a_y_l.append(a_y)
             a_x_l.append(a_x)
@@ -259,7 +262,7 @@ def updates_appends(faza):
         R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
         Hnpm = R_xy - R_Z
 
-        if Hnpm >= 100 and i % jak_często == 0:
+        if Hnpm >= 1000 and i % jak_często == 0:
             x_forplot.append(X_location)
             y_forplot.append(Y_location)
 
@@ -268,14 +271,14 @@ def updates_appends(faza):
             listR_xy.append(R_xy)
             listH_xy.append(Hnpm / 1000)
             v_xy_l.append(v_xy(v_x, v_y))
-            v_x_l.append((v_x))
-            v_y_l.append((v_y))
+            v_x_l.append(v_x)
+            v_y_l.append(v_y)
             droga_l.append(droga)
             a_y_l.append(a_y)
             a_x_l.append(a_x)
             a_xy_l.append(a_xy(a_x, a_y))
 
-        if Hnpm < 100:
+        if Hnpm < 1000:
             x_forplot.append(X_location)
             y_forplot.append(Y_location)
 
@@ -286,8 +289,8 @@ def updates_appends(faza):
             listR_xy.append(R_xy)
             listH_xy.append(Hnpm / 1000)
             v_xy_l.append(v_xy(v_x, v_y))
-            v_x_l.append((v_x))
-            v_y_l.append((v_y))
+            v_x_l.append(v_x)
+            v_y_l.append(v_y)
             droga_l.append(droga)
             a_y_l.append(a_y)
             a_x_l.append(a_x)
@@ -305,7 +308,7 @@ def updates_appends(faza):
         R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
         Hnpm = R_xy - R_Z
 
-        if Hnpm >= 100 and i % jak_często == 0:
+        if Hnpm >= 1000 and i % jak_często == 0:
             x_forplot.append(X_location)
             y_forplot.append(Y_location)
 
@@ -314,14 +317,14 @@ def updates_appends(faza):
             listR_xy.append(R_xy)
             listH_xy.append(Hnpm / 1000)
             v_xy_l.append(v_xy(v_x, v_y))
-            v_x_l.append((v_x))
-            v_y_l.append((v_y))
+            v_x_l.append(v_x)
+            v_y_l.append(v_y)
             droga_l.append(droga)
             a_y_l.append(a_y)
             a_x_l.append(a_x)
             a_xy_l.append(a_xy(a_x, a_y))
 
-        if Hnpm < 100:
+        if Hnpm < 1000:
             x_forplot.append(X_location)
             y_forplot.append(Y_location)
 
@@ -332,8 +335,8 @@ def updates_appends(faza):
             listR_xy.append(R_xy)
             listH_xy.append(Hnpm / 1000)
             v_xy_l.append(v_xy(v_x, v_y))
-            v_x_l.append((v_x))
-            v_y_l.append((v_y))
+            v_x_l.append(v_x)
+            v_y_l.append(v_y)
             droga_l.append(droga)
             a_y_l.append(a_y)
             a_x_l.append(a_x)
@@ -359,7 +362,6 @@ def naprowadzanie_na_orbite():
             a_t_y = 0
     if a_t_x != 0 or a_t_y != 0:
         test = 1
-    print(m_p)
 
 def troche_jak_prawdziwa():
     global R_xy, v_x, X_location, Y_location, v_y, m_r, droga, Hnpm, a_t_x, a_t_y, test, m_p
@@ -390,7 +392,7 @@ def zawsze_prostopadle():
         test = 1
 
 def obliczenia_numeryczne(faza, p_important_values, wysokość, tryb_pracy_silników):
-    global R_xy, X_location, Y_location, m_r, droga, Hnpm, H_startu, jak_często, test, m_p
+    global R_xy, X_location, Y_location, m_r, droga, Hnpm, H_startu, jak_często, test, m_p, czy_faza1, czy_faza2, czy_faza3
 
     if faza == 0:
         while R_xy > R_Z:
@@ -398,7 +400,7 @@ def obliczenia_numeryczne(faza, p_important_values, wysokość, tryb_pracy_silni
 
             updates_appends(faza)
 
-            if p_important_values == 1:
+            if p_important_values == 1 and i % jak_często == 0:
                 print_important_values(faza)
 
     if faza == 1:
@@ -406,9 +408,12 @@ def obliczenia_numeryczne(faza, p_important_values, wysokość, tryb_pracy_silni
             obliczanie_przyspieszenia(faza)
 
             updates_appends(faza)
-
-            if p_important_values == 1:
+            czy_faza1 = 1
+            if p_important_values == 1 and i % jak_często == 0:
                 print_important_values(faza)
+            if Hnpm < 1000:
+                print_important_values(faza)
+
 
     if faza == 2:
 
@@ -431,23 +436,35 @@ def obliczenia_numeryczne(faza, p_important_values, wysokość, tryb_pracy_silni
             obliczanie_przyspieszenia(faza)
 
             updates_appends(faza)
-
-            if p_important_values == 1:
+            czy_faza2 = 1
+            if p_important_values == 1 and i % jak_często == 0:
+                print_important_values(faza)
+            if Hnpm < 1000:
                 print_important_values(faza)
 
     if faza == 3:
         while R_xy > R_Z:
 
-            if droga > 6 * R_Z and X_location > wazny_x[1]:
-                break
-            if droga > 8 * R_Z:
-                break
+            if R_Z <= 6371000:
+                if test ==1:
+                    if droga > 6 * 6371000 and X_location > wazny_x[1]:
+                        break
+                if droga > 8 * 6371000:
+                    break
+            else:
+                if test ==1:
+                    if droga > 6 * R_Z and X_location > wazny_x[1]:
+                        break
+                if droga > 8 * R_Z:
+                    break
 
             obliczanie_przyspieszenia(faza)
 
             updates_appends(faza)
-
-            if p_important_values == 1:
+            czy_faza3 = 1
+            if p_important_values == 1 and i % jak_często == 0:
+                print_important_values(faza)
+            if Hnpm < 1000:
                 print_important_values(faza)
 
 def prędkość_kosmiczna(R):
@@ -499,7 +516,7 @@ def print_important_values(faza):
         if faza == 2:
             print(m_p)
         print(
-            f'a_x: {round(a_x, 2)} m/s^2 ||  ay: {round(a_y, 2)} m/s^2 || a_xy = {round((a_x ** 2 + a_y ** 2) ** 0.5, 2)} || v_xy = {round((v_x ** 2 + v_y ** 2) ** 0.5, 2)}')
+            f'a_x: {round(a_x, 2)} m/s^2 ||  ay: {round(a_y, 2)} m/s^2 || a_xy = {round((a_x ** 2 + a_y ** 2) ** 0.5, 2)} || v_x = {round(v_x, 2)} || v_y = {round(v_y, 2)}')
         print(
             f'Location (x,y): {[round(X_location, 0), round(Y_location)]}[m] || H: {round(R_xy - R_Z)}[m] ||  t: {round(i / 3600000, 2)}[s] || m_r: {m_r : .8}\n')
     except:
@@ -538,6 +555,58 @@ def print_ploted_data():
     print(wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x)
     print(v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly)
     print('---------------------------------------------------------------------------------')
+
+def przywracanie_do_poczatkowych():
+    global M_Z, R_Z, G, V_1, x_0, y_00, y_0, k, Dt, f, S, m_m, v_g, m_r_p, jak_często, tryb_pracy_silników, v_x0,v_y0, m_p0, H_startu
+    global droga, X_location, Y_location, R_xy, Hnpm, v_x, v_y, i, spin, m_r, m_p, Dm_1s, test, test1, czy_faza1, czy_faza2, czy_faza3
+    global x_forplot, x1_forplot, y_forplot, y1_forplot, listR_xy, listH_xy, listH_xy1, wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x, v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly
+    # Stałe------------------------------------------------------------------------------------------------------------------
+    M_Z = 5.98 * 10 ** 24  # masa ziemi
+    R_Z = 6371000  # promień ziemi
+    G = 6.6743 * 10 ** (-11)  # stała grawitacyjna
+    V_1 = np.sqrt(G * M_Z / R_Z)  # I prędkośćkosmiczna
+    x_0 = 0  # pocztkowy x
+    y_00 = 20
+    y_0 = R_Z + y_00  # pocztkowy y
+    k = G * M_Z  # wsp staej grawitacji
+    Dt = 0.01  # czas aktualizacji
+    # alpha = nu.angle(0, deg=True)
+    f = 0.125  # Drag coefficient for rocket
+    S = np.pi * 0.5 ** 2  # Rocket cross-section
+    m_m = 10300  # masa całego modułu
+    v_g = 8750  # prędkość gazów wylotowych
+    m_r_p = 1000  # początkowa masa rakiety
+    jak_często = 100  # gęstość rozmieszczenia punktów - dla 100 pokazuje lokalizacje co 1s
+    tryb_pracy_silników = 0
+    v_x0 = 1000  # prędkość początkowa y
+    v_y0 = 1800  # prędkość początkowa y
+    m_p0 = 600  # masa paliwa
+    H_startu = 100000
+
+    # zmienne----------------------------------------------------------------------------------------------------------------
+    droga = 0  # zmienna drogi
+    X_location = x_0  # zmienna położenia x
+    Y_location = y_0  # zmienna położenia y
+    R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5  # odległość rakiety od środka ziemi
+    Hnpm = R_xy - R_Z  # wysokość npm
+    v_x = v_x0  # zmienna prędkości x
+    v_y = v_y0  # zmienna prędkości y
+    i = 0  # ilość punktów
+    spin = 0
+    m_r = m_r_p  # zmienna masa rakiety
+    m_p = m_p0
+    Dm_1s = m_p / 150  # paliwo tracone w czasie 1 s
+    test = 0
+    test1 = 0
+    czy_faza1 = 0
+    czy_faza2 = 0
+    czy_faza3 = 0
+    x_forplot, x1_forplot = [x_0], [x_0]
+    y_forplot, y1_forplot = [y_0], [y_0]
+    listR_xy = [R_xy]  # potrzebne? -> TAK
+    listH_xy, listH_xy1 = [], []
+    wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x = [], [], [], [], [], []
+    v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly = [], [], [], [], [], [], [], [], []
 
 def wyświetlanie_wykresów(orbita, dane):
     # Tworzenie tekstu-------------------------------------------------------------------------------------------------------
@@ -582,8 +651,10 @@ def wyświetlanie_wykresów(orbita, dane):
         '''ax.subplots_adjust(bottom=0.25)
         axslider = ax.add_axes([0.1, 0.1, 0.6, 0.05])
         slider = Slider(ax=axslider, label="Time", valmin=0, valmax=i-1, valstep=1)
+
         def update(indx):
             ax1.scatter(x_forplot[indx], y_forplot[indx], color='Black')
+
         ax.canvas.draw_idle()
         slider.on_changed(update)'''
 
@@ -712,7 +783,6 @@ def create_button(x, y, width, height, hovercolor, defaultcolor):
     else:
         pygame.draw.rect(screen, defaultcolor, (x, y, width, height))
 
-
 # ekran 1. --------------------------------------------------------------------------------------------------------------
 def intro():
     title = titlefont.render("PROJEKT SPINLAUNCH", True, white)
@@ -823,7 +893,7 @@ def wybor_trybu():
 # wprowadzanie danych----------------------------------------------------------------------------------------------------
 def data_input():
     global test, R_xy, v_x0, v_y0, jak_często, v_x, X_location, Y_location, v_y, m_r, droga, Hnpm, i, x_forplot, x1_forplot, y_forplot, y1_forplot, droga_l, listH_xy, listH_xy1, listR_xy, v_xy_l, v_x_l, v_y_l, a_xy_l, a_x_l, a_y_l, m_p, H_startu, tryb_pracy_silników
-
+    przywracanie_do_poczatkowych()
     title_text = font.render("WPROWADŹ NASTĘPUJĄCE PARAMETRY", True, gold)
     vv_x = ''
     vv_y = ''
@@ -851,11 +921,11 @@ def data_input():
         screen.blit(misteryImg, (0, 0))
         screen.blit(title_text, (40, 20))
 
-        # Y_0
+        '''# Y_0
         Y_0Surface = littlefont.render(YY_0, True, white)
         Y_0Border = pygame.Rect(650, screen_height - 690,
                                 Y_0Surface.get_width() + 10, 40)
-        screen.blit(Y_0Surface, (655, screen_height - 680))
+        screen.blit(Y_0Surface, (655, screen_height - 680))'''
 
         # v_x
         v_xSurface = littlefont.render(vv_x, True, white)
@@ -908,7 +978,7 @@ def data_input():
                     pygame.quit()
                     sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if Y_0Border.collidepoint(event.pos):
+                '''if Y_0Border.collidepoint(event.pos):
                     Y_0Active = True
                     v_xActive = False
                     v_yActive = False
@@ -916,7 +986,7 @@ def data_input():
                     H_startuActive = False
                     t0Active = False
                     t1Active = False
-                    t2Active = False
+                    t2Active = False'''
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if v_xBorder.collidepoint(event.pos):
                     Y_0Active = False
@@ -1080,40 +1150,40 @@ def data_input():
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-        if Y_0Active:
+        '''if Y_0Active:
             pygame.draw.rect(screen, white, Y_0Border, 2)
             Y_0Prompt = littlefont.render("WYSOKOŚĆ STARTU", True, white)
         else:
             pygame.draw.rect(screen, slategrey, Y_0Border, 2)
-            Y_0Prompt = littlefont.render("WYSOKOŚĆ STARTU", True, slategrey)
+            Y_0Prompt = littlefont.render("WYSOKOŚĆ STARTU", True, slategrey)'''
 
         if v_xActive:
             pygame.draw.rect(screen, white, v_xBorder, 2)
-            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ", True, white)
+            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, v_xBorder, 2)
-            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ", True, slategrey)
+            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m]", True, slategrey)
 
         if v_yActive:
             pygame.draw.rect(screen, white, v_yBorder, 2)
-            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ", True, white)
+            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, v_yBorder, 2)
-            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ", True, slategrey)
+            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m]", True, slategrey)
 
         if m_pActive:
             pygame.draw.rect(screen, white, m_pBorder, 2)
-            m_pPrompt = littlefont.render("MASA PALIWA (KG)", True, white)
+            m_pPrompt = littlefont.render("MASA PALIWA [KG]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, m_pBorder, 2)
-            m_pPrompt = littlefont.render("MASA PALIWA (KG)", True, slategrey)
+            m_pPrompt = littlefont.render("MASA PALIWA [KG]", True, slategrey)
 
         if H_startuActive:
             pygame.draw.rect(screen, white, H_startuBorder, 2)
-            H_startuPrompt = littlefont.render("WYSOKOŚĆ URUCHOMIENIA SILNIKÓW", True, white)
+            H_startuPrompt = littlefont.render("WYSOKOŚĆ URUCHOMIENIA SILNIKÓW [km]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, H_startuBorder, 2)
-            H_startuPrompt = littlefont.render("WYSOKOŚĆ URUCHOMIENIA SILNIKÓW", True, slategrey)
+            H_startuPrompt = littlefont.render("WYSOKOŚĆ URUCHOMIENIA SILNIKÓW [km]", True, slategrey)
 
         if t0Active:
             pygame.draw.rect(screen, white, t0Border, 2)
@@ -1140,7 +1210,7 @@ def data_input():
             t2Prompt = littlefont.render("tryb 2 - sila ciągu zawsze działa", True, slategrey)
             t2Prompt1 = littlefont.render("równolegle do powierzchni ziemi", True, slategrey)
 
-        screen.blit(Y_0Prompt, (50, (screen_height - 700) + v_xSurface.get_height()))
+        ''' screen.blit(Y_0Prompt, (50, (screen_height - 700) + v_xSurface.get_height()))'''
         screen.blit(v_xPrompt, (50, (screen_height - 630) + v_xSurface.get_height()))
         screen.blit(v_yPrompt, (50, (screen_height - 560) + v_ySurface.get_height()))
         screen.blit(m_pPrompt, (50, (screen_height - 490) + m_pSurface.get_height()))
@@ -1171,7 +1241,7 @@ def data_input():
             if mm_p != "":
                 m_p = float(mm_p)
             if HH_startu != "":
-                H_startu = float(HH_startu)
+                H_startu = float(HH_startu)*1000
             if t0Active != False:
                 tryb_pracy_silników = 0
             if t1Active != False:
@@ -1184,20 +1254,18 @@ def data_input():
             spin = 1  # spin = 1 odpalamy spinlauncha
             if spin == 1:
 
-                #H_startu = 100000
                 jak_często = 100
 
                 obliczenia_numeryczne(0, 0, H_startu, 0)  # Silniki nie zadzaiłały
 
                 reset_xyv()  # resetuje wartości po I przelocie
 
-                obliczenia_numeryczne(1, 0, H_startu,
-                                      0)  # I faza ruchu - do odpalenia silników
+                obliczenia_numeryczne(1, 0, H_startu, 0)  # I faza ruchu - do odpalenia silników
                 if Hnpm > H_startu:
                     update_important_values(X_location, Y_location, droga, Hnpm / 1000, a_xy(a_x, a_y), v_xy(v_x, v_y))
                     test1 = 1
 
-                obliczenia_numeryczne(2, 0, H_startu, tryb_pracy_silników)  # II faza ruchu - z silnikami
+                obliczenia_numeryczne(2, 0, H_startu, 0)  # II faza ruchu - z silnikami
 
                 if test == 1:
                     if test1 == 0:
@@ -1207,9 +1275,8 @@ def data_input():
                                             v_xy_l[-1])
                     test = 0
 
-                obliczenia_numeryczne(3, 0, H_startu,
-                                      0)  # III faza ruchu - po wyczerpaniu paliwa
-                print(v_x0, v_y0, H_startu, tryb_pracy_silników, Y_location)
+                obliczenia_numeryczne(3, 0, H_startu, 0)  # III faza ruchu - po wyczerpaniu paliwa
+
                 wyświetlanie_wykresów(1, 1)  # 0 nie wyświetlam, 1 wyświetlam
                 clear()
 
@@ -1219,8 +1286,9 @@ def data_input():
 
 # piaskownica-----------------------------------------------------------------------------------------------------------
 def piaskownica():
-    global test, R_xy, v_x0, v_y0, jak_często, v_x, X_location, Y_location, v_y, m_r, droga, Hnpm, i, x_forplot, x1_forplot, y_forplot, y1_forplot, droga_l, listH_xy, listH_xy1, listR_xy, v_xy_l, v_x_l, v_y_l, a_xy_l, a_x_l, a_y_l, m_p, H_startu, tryb_pracy_silników
-    global f, M_Z, R_Z
+    global test, y_0, R_xy, v_x0, v_y0, jak_często, v_x, X_location, Y_location, v_y, m_r, droga, Hnpm, i, x_forplot, x1_forplot, y_forplot, y1_forplot, droga_l, listH_xy, listH_xy1, listR_xy, v_xy_l, v_x_l, v_y_l, a_xy_l, a_x_l, a_y_l, m_p, H_startu, tryb_pracy_silników
+    global f, M_Z, R_Z, y_00, test1, k, m_p0
+    przywracanie_do_poczatkowych()
     title_text = font.render("WPROWADŹ DANE", True, gold)
     vv_x = ''
     vv_y = ''
@@ -1652,37 +1720,37 @@ def piaskownica():
 
         if Y_0Active:
             pygame.draw.rect(screen, white, Y_0Border, 2)
-            Y_0Prompt = littlefont.render("WYSOKOŚĆ STARTU", True, white)
+            Y_0Prompt = littlefont.render("WYSOKOŚĆ STARTU [m]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, Y_0Border, 2)
-            Y_0Prompt = littlefont.render("WYSOKOŚĆ STARTU", True, slategrey)
+            Y_0Prompt = littlefont.render("WYSOKOŚĆ STARTU [m]", True, slategrey)
         if v_xActive:
             pygame.draw.rect(screen, white, v_xBorder, 2)
-            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ", True, white)
+            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m/s]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, v_xBorder, 2)
-            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ", True, slategrey)
+            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m/s]", True, slategrey)
 
         if v_yActive:
             pygame.draw.rect(screen, white, v_yBorder, 2)
-            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ", True, white)
+            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m/s]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, v_yBorder, 2)
-            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ", True, slategrey)
+            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m/s]", True, slategrey)
 
         if m_pActive:
             pygame.draw.rect(screen, white, m_pBorder, 2)
-            m_pPrompt = littlefont.render("MASA PALIWA (KG)", True, white)
+            m_pPrompt = littlefont.render("MASA PALIWA [KG]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, m_pBorder, 2)
-            m_pPrompt = littlefont.render("MASA PALIWA (KG)", True, slategrey)
+            m_pPrompt = littlefont.render("MASA PALIWA [KG]", True, slategrey)
 
         if H_startuActive:
             pygame.draw.rect(screen, white, H_startuBorder, 2)
-            H_startuPrompt = littlefont.render("WYSOKOŚĆ URUCHOMIENIA SILNIKÓW", True, white)
+            H_startuPrompt = littlefont.render("WYSOKOŚĆ URUCHOMIENIA SILNIKÓW [m]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, H_startuBorder, 2)
-            H_startuPrompt = littlefont.render("WYSOKOŚĆ URUCHOMIENIA SILNIKÓW", True, slategrey)
+            H_startuPrompt = littlefont.render("WYSOKOŚĆ URUCHOMIENIA SILNIKÓW [m]", True, slategrey)
 
         if t0Active:
             pygame.draw.rect(screen, white, t0Border, 2)
@@ -1728,10 +1796,10 @@ def piaskownica():
 
         if R_ZActive:
             pygame.draw.rect(screen, white, R_ZBorder, 2)
-            R_ZPrompt = littlefont.render("PROMIEŃ PLANETY (KM)", True, white)
+            R_ZPrompt = littlefont.render("PROMIEŃ PLANETY [KM]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, R_ZBorder, 2)
-            R_ZPrompt = littlefont.render("PROMIEŃ PLANETY (KM)", True, slategrey)
+            R_ZPrompt = littlefont.render("PROMIEŃ PLANETY [KM]", True, slategrey)
 
         screen.blit(Y_0Prompt, (50, (screen_height - 700) + v_xSurface.get_height()))
         screen.blit(v_xPrompt, (50, (screen_height - 630) + v_xSurface.get_height()))
@@ -1755,8 +1823,6 @@ def piaskownica():
         screen.blit(ready, (1200 - 195, int(screen_height * .9)))
 
         if readyButtton:
-            if YY_0 != "":
-                Y_location = float(YY_0)
             if vv_x != "":
                 v_x = float(vv_x)
                 v_x0 = float(vv_x)
@@ -1764,15 +1830,22 @@ def piaskownica():
                 v_y = float(vv_y)
                 v_y0 = float(vv_y)
             if mm_p != "":
-                m_p = float(mm_p)
+                m_p0 = float(mm_p)
+                m_p = m_p0
             if HH_startu != "":
                 H_startu = float(HH_startu)
             if ff != "":
                 f = float(ff)
             if MM_Z != "":
                 M_Z = float(MM_Z)*10**24
+                k = G * M_Z
             if RR_Z != "":
-                R_Z = float(RR_Z)
+                R_Z = float(RR_Z)*1000
+            if YY_0 != "":
+                y_00 = float(YY_0)
+                y_0 = R_Z + y_00
+                Y_location = y_0
+
             if t0Active != False:
                 tryb_pracy_silników = 0
             if t1Active != False:
@@ -1782,9 +1855,11 @@ def piaskownica():
             else:
                 pass
 
+            clear()
+            jak_często = 1
             spin = 0  # spin = 1 odpalamy spinlauncha
             if spin != 1:
-                test = 1
+                '''test = 1
                 while test == 1:
                     #v_x0 = 100
                     #v_y0 = 0
@@ -1794,7 +1869,6 @@ def piaskownica():
                         test = 0
                     else:
                         test = 1
-
                 test = 1
                 while test == 1:
                     #f = f  # drag coeficient
@@ -1833,7 +1907,6 @@ def piaskownica():
                         test = 0
                     else:
                         test = 1
-
                 print('4')
                 test = 1
                 while test == 1:
@@ -1843,60 +1916,56 @@ def piaskownica():
                         test = 0
                     else:
                         test = 1
-
                 test = 1
                 while test == 1:
                     jak_często = 1  # jeśli masz podejrzenie, że twój wykres będzie mały, zmniejsz (w przedziałach od 1 do 1000)
                     if 1 <= jak_często <= 1000:
                         test = 0
                     else:
-                        test = 1
-
-                print(droga_l)
-                obliczenia_numeryczne(1, 0, H_startu,
-                                      tryb_pracy_silników)  # I faza ruchu - do odpalenia silników
-                print(droga_l)
+                        test = 1'''
                 '''try:
-                    update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1], v_xy_l[-1])
-                except:
-                    test = 1
-                    a_y = -k * cos(X_location, Y_location) * R_xy ** (-2)
-                    a_x = -k * sin(X_location, Y_location) * R_xy ** (-2)
-                    a_t_x = 0.1
-                    a_t_y = 0.1
-                    pass
-                print('7')
-                obliczenia_numeryczne(2, 0, wysokość=H_startu, tryb_pracy_silników=0)  # II faza ruchu - z silnikami
-                print('8')
-                if test == 1:
-                    try:
-                        update_important_values(x_forplot[0], y_forplot[0], droga_l[0], listH_xy[0], a_xy_l[0], v_xy_l[0])
-                    except:
-                        print(x_forplot[0])
-                        print(x_forplot[0], y_forplot[0])
-                        print(x_forplot[0], y_forplot[0], droga_l[0])
-                        print(x_forplot[0], y_forplot[0], droga_l[0], listH_xy[0])
-                        print(x_forplot[0], y_forplot[0], droga_l[0], listH_xy[0], a_xy_l[0])
-                        print(x_forplot[0], y_forplot[0], droga_l[0], listH_xy[0], a_xy_l[0], v_xy_l[0])
-                update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1], v_xy_l[-1])'''  # stara obsługa błędów
+                                   update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1], v_xy_l[-1])
+                               except:
+                                   test = 1
+                                   a_y = -k * cos(X_location, Y_location) * R_xy ** (-2)
+                                   a_x = -k * sin(X_location, Y_location) * R_xy ** (-2)
+                                   a_t_x = 0.1
+                                   a_t_y = 0.1
+                                   pass
+                               print('7')
+                               obliczenia_numeryczne(2, 0, wysokość=H_startu, tryb_pracy_silników=0)  # II faza ruchu - z silnikami
+                               print('8')
+                               if test == 1:
+                                   try:
+                                       update_important_values(x_forplot[0], y_forplot[0], droga_l[0], listH_xy[0], a_xy_l[0], v_xy_l[0])
+                                   except:
+                                       print(x_forplot[0])
+                                       print(x_forplot[0], y_forplot[0])
+                                       print(x_forplot[0], y_forplot[0], droga_l[0])
+                                       print(x_forplot[0], y_forplot[0], droga_l[0], listH_xy[0])
+                                       print(x_forplot[0], y_forplot[0], droga_l[0], listH_xy[0], a_xy_l[0])
+                                       print(x_forplot[0], y_forplot[0], droga_l[0], listH_xy[0], a_xy_l[0], v_xy_l[0])
+                               update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1], v_xy_l[-1])'''  # stara obsługa błędów
 
-                test1 = Hnpm
-                if 0 < Hnpm < H_startu:
+                print_important_values(2)
+                print('--------------------------')
+                obliczenia_numeryczne(1, 0, H_startu, 0)  # I faza ruchu - do odpalenia silników
+                if czy_faza1 == 1:
+                    update_important_values(X_location, Y_location, droga, Hnpm / 1000, a_xy(a_x, a_y), v_xy(v_x, v_y))
+                    test1 = 1
+                print('--------------------------')
+                obliczenia_numeryczne(2, 0, H_startu, 0)  # II faza ruchu - z silnikami
+
+                if test == 1:
+                    if test1 == 0:
+                        update_important_values(x_forplot[1], y_forplot[1], droga_l[1], listH_xy[1], a_xy_l[1],
+                                                v_xy_l[1])
                     update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1],
                                             v_xy_l[-1])
+                    test = 0
+                print('--------------------------')
+                obliczenia_numeryczne(3, 0, H_startu, 0)  # III faza ruchu - po wyczerpaniu paliwa
 
-                obliczenia_numeryczne(2, 0, H_startu, tryb_pracy_silników)  # II faza ruchu - z silnikami
-
-                if Hnpm > H_startu:
-                    update_important_values(x_forplot[1], y_forplot[1], droga_l[1], listH_xy[1], a_xy_l[1], v_xy_l[1])
-
-                if test == 1:
-                    update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1],
-                                            v_xy_l[-1])
-
-                obliczenia_numeryczne(3, 0, H_startu,
-                                      tryb_pracy_silników)  # III faza ruchu - po wyczerpaniu paliwa
-                print(v_x0, v_y0, H_startu, m_p, tryb_pracy_silników, f, M_Z, R_Z, Y_location)
                 wyświetlanie_wykresów(1, 1)  # 0 nie wyświetlam, 1 wyświetlam
                 clear()
 

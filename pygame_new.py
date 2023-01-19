@@ -4,57 +4,61 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Cursor, Slider
 
-# Stałe------------------------------------------------------------------------------------------------------------------
-M_Z = 5.98 * 10 ** 24  # masa ziemi
-R_Z = 6371000  # promień ziemi
-G = 6.6743 * 10 ** (-11)  # stała grawitacyjna
-V_1 = np.sqrt(G * M_Z / R_Z)  # I prędkośćkosmiczna
-x_0 = 0  # pocztkowy x
-y_00 = 20
-y_0 = R_Z + y_00  # pocztkowy y
-k = G * M_Z  # wsp staej grawitacji
-Dt = 0.01  # czas aktualizacji
-# alpha = nu.angle(0, deg=True)
-f = 0.125  # Drag coefficient for rocket
-S = np.pi * 0.5 ** 2  # Rocket cross-section
-m_m = 10300  # masa całego modułu
-v_g = 8750  # prędkość gazów wylotowych
-m_r_p = 1000  # początkowa masa rakiety
-jak_często = 100  # gęstość rozmieszczenia punktów - dla 100 pokazuje lokalizacje co 1s
-tryb_pracy_silników = 0
-v_x0 = 1000  # prędkość początkowa y
-v_y0 = 1800  # prędkość początkowa y
-m_p0 = 600  # masa paliwa
-H_startu = 100000
-
-# zmienne----------------------------------------------------------------------------------------------------------------
-droga = 0  # zmienna drogi
-X_location = x_0  # zmienna położenia x
-Y_location = y_0  # zmienna położenia y
-R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5  # odległość rakiety od środka ziemi
-Hnpm = R_xy - R_Z  # wysokość npm
-v_x = v_x0  # zmienna prędkości x
-v_y = v_y0  # zmienna prędkości y
-i = 0  # ilość punktów
-spin = 0
-m_r = m_r_p  # zmienna masa rakiety
-m_p = m_p0
-Dm_1s = m_p / 150  # paliwo tracone w czasie 1 s
-test = 0
-test1 = 0
-czy_faza1 = 0
-czy_faza2 = 0
-czy_faza3 = 0
-
-# Listy------------------------------------------------------------------------------------------------------------------
-x_forplot, x1_forplot = [X_location], [X_location]
-y_forplot, y1_forplot = [Y_location], [Y_location]
-listR_xy = [R_xy]  # potrzebne? -> TAK
-listH_xy, listH_xy1 = [], []
-wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x = [], [], [], [], [], []
-v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly = [], [], [], [], [], [], [], [], []
-
 #funkcje do wykresu------------------------------------------------------------------------------------------------------
+def przywracanie_do_poczatkowych():
+    global M_Z, R_Z, G, V_1, x_0, y_00, y_0, k, Dt, f, S, m_m, v_g, m_r_p, jak_często, tryb_pracy_silników, v_x0,v_y0, m_p0, H_startu
+    global droga, X_location, Y_location, R_xy, Hnpm, v_x, v_y, i, spin, m_r, m_p, Dm_1s, test, test1, czy_faza1, czy_faza2, czy_faza3
+    global x_forplot, x1_forplot, y_forplot, y1_forplot, listR_xy, listH_xy, listH_xy1, wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x, v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly
+    # Stałe------------------------------------------------------------------------------------------------------------------
+    M_Z = 5.98 * 10 ** 24  # masa ziemi
+    R_Z = 6371000  # promień ziemi
+    G = 6.6743 * 10 ** (-11)  # stała grawitacyjna
+    V_1 = np.sqrt(G * M_Z / R_Z)  # I prędkośćkosmiczna
+    x_0 = 0  # pocztkowy x
+    y_00 = 20
+    y_0 = R_Z + y_00  # pocztkowy y
+    k = G * M_Z  # wsp staej grawitacji
+    Dt = 0.01  # czas aktualizacji
+    # alpha = nu.angle(0, deg=True)
+    f = 0.125  # Drag coefficient for rocket
+    S = np.pi * 0.5 ** 2  # Rocket cross-section
+    m_m = 10300  # masa całego modułu
+    v_g = 8750  # prędkość gazów wylotowych
+    m_r_p = 1000  # początkowa masa rakiety
+    jak_często = 100  # gęstość rozmieszczenia punktów - dla 100 pokazuje lokalizacje co 1s
+    tryb_pracy_silników = 0
+    v_x0 = 1000  # prędkość początkowa y
+    v_y0 = 1800  # prędkość początkowa y
+    m_p0 = 600  # masa paliwa
+    H_startu = 100000
+
+    # zmienne----------------------------------------------------------------------------------------------------------------
+    droga = 0  # zmienna drogi
+    X_location = x_0  # zmienna położenia x
+    Y_location = y_0  # zmienna położenia y
+    R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5  # odległość rakiety od środka ziemi
+    Hnpm = R_xy - R_Z  # wysokość npm
+    v_x = v_x0  # zmienna prędkości x
+    v_y = v_y0  # zmienna prędkości y
+    i = 0  # ilość punktów
+    spin = 0
+    m_r = m_r_p  # zmienna masa rakiety
+    m_p = m_p0
+    Dm_1s = m_p / 150  # paliwo tracone w czasie 1 s - Moc silników
+    test = 0
+    test1 = 0
+    czy_faza1 = 0
+    czy_faza2 = 0
+    czy_faza3 = 0
+    x_forplot, x1_forplot = [x_0], [x_0]
+    y_forplot, y1_forplot = [y_0], [y_0]
+    listR_xy = [R_xy]  # potrzebne? -> TAK
+    listH_xy, listH_xy1 = [], []
+    wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x = [], [], [], [], [], []
+    v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly = [], [], [], [], [], [], [], [], []
+
+przywracanie_do_poczatkowych()
+
 def obliczanie_przyspieszenia(faza):
     global R_xy, v_x, X_location, Y_location, v_y, m_r, a_x, a_y, droga, Hnpm, a_t_x, a_t_y, a_x, jak_często
     if faza == 0:
@@ -556,57 +560,6 @@ def print_ploted_data():
     print(v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly)
     print('---------------------------------------------------------------------------------')
 
-def przywracanie_do_poczatkowych():
-    global M_Z, R_Z, G, V_1, x_0, y_00, y_0, k, Dt, f, S, m_m, v_g, m_r_p, jak_często, tryb_pracy_silników, v_x0,v_y0, m_p0, H_startu
-    global droga, X_location, Y_location, R_xy, Hnpm, v_x, v_y, i, spin, m_r, m_p, Dm_1s, test, test1, czy_faza1, czy_faza2, czy_faza3
-    global x_forplot, x1_forplot, y_forplot, y1_forplot, listR_xy, listH_xy, listH_xy1, wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x, v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly
-    # Stałe------------------------------------------------------------------------------------------------------------------
-    M_Z = 5.98 * 10 ** 24  # masa ziemi
-    R_Z = 6371000  # promień ziemi
-    G = 6.6743 * 10 ** (-11)  # stała grawitacyjna
-    V_1 = np.sqrt(G * M_Z / R_Z)  # I prędkośćkosmiczna
-    x_0 = 0  # pocztkowy x
-    y_00 = 20
-    y_0 = R_Z + y_00  # pocztkowy y
-    k = G * M_Z  # wsp staej grawitacji
-    Dt = 0.01  # czas aktualizacji
-    # alpha = nu.angle(0, deg=True)
-    f = 0.125  # Drag coefficient for rocket
-    S = np.pi * 0.5 ** 2  # Rocket cross-section
-    m_m = 10300  # masa całego modułu
-    v_g = 8750  # prędkość gazów wylotowych
-    m_r_p = 1000  # początkowa masa rakiety
-    jak_często = 100  # gęstość rozmieszczenia punktów - dla 100 pokazuje lokalizacje co 1s
-    tryb_pracy_silników = 0
-    v_x0 = 1000  # prędkość początkowa y
-    v_y0 = 1800  # prędkość początkowa y
-    m_p0 = 600  # masa paliwa
-    H_startu = 100000
-
-    # zmienne----------------------------------------------------------------------------------------------------------------
-    droga = 0  # zmienna drogi
-    X_location = x_0  # zmienna położenia x
-    Y_location = y_0  # zmienna położenia y
-    R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5  # odległość rakiety od środka ziemi
-    Hnpm = R_xy - R_Z  # wysokość npm
-    v_x = v_x0  # zmienna prędkości x
-    v_y = v_y0  # zmienna prędkości y
-    i = 0  # ilość punktów
-    spin = 0
-    m_r = m_r_p  # zmienna masa rakiety
-    m_p = m_p0
-    Dm_1s = m_p / 150  # paliwo tracone w czasie 1 s
-    test = 0
-    test1 = 0
-    czy_faza1 = 0
-    czy_faza2 = 0
-    czy_faza3 = 0
-    x_forplot, x1_forplot = [x_0], [x_0]
-    y_forplot, y1_forplot = [y_0], [y_0]
-    listR_xy = [R_xy]  # potrzebne? -> TAK
-    listH_xy, listH_xy1 = [], []
-    wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x = [], [], [], [], [], []
-    v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly = [], [], [], [], [], [], [], [], []
 
 def wyświetlanie_wykresów(orbita, dane):
     # Tworzenie tekstu-------------------------------------------------------------------------------------------------------
@@ -921,12 +874,6 @@ def data_input():
         screen.blit(misteryImg, (0, 0))
         screen.blit(title_text, (40, 20))
 
-        '''# Y_0
-        Y_0Surface = littlefont.render(YY_0, True, white)
-        Y_0Border = pygame.Rect(650, screen_height - 690,
-                                Y_0Surface.get_width() + 10, 40)
-        screen.blit(Y_0Surface, (655, screen_height - 680))'''
-
         # v_x
         v_xSurface = littlefont.render(vv_x, True, white)
         v_xBorder = pygame.Rect(650, screen_height - 620,
@@ -977,16 +924,6 @@ def data_input():
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                '''if Y_0Border.collidepoint(event.pos):
-                    Y_0Active = True
-                    v_xActive = False
-                    v_yActive = False
-                    m_pActive = False
-                    H_startuActive = False
-                    t0Active = False
-                    t1Active = False
-                    t2Active = False'''
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if v_xBorder.collidepoint(event.pos):
                     Y_0Active = False
@@ -1150,12 +1087,6 @@ def data_input():
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-        '''if Y_0Active:
-            pygame.draw.rect(screen, white, Y_0Border, 2)
-            Y_0Prompt = littlefont.render("WYSOKOŚĆ STARTU", True, white)
-        else:
-            pygame.draw.rect(screen, slategrey, Y_0Border, 2)
-            Y_0Prompt = littlefont.render("WYSOKOŚĆ STARTU", True, slategrey)'''
 
         if v_xActive:
             pygame.draw.rect(screen, white, v_xBorder, 2)
@@ -1210,7 +1141,6 @@ def data_input():
             t2Prompt = littlefont.render("tryb 2 - sila ciągu zawsze działa", True, slategrey)
             t2Prompt1 = littlefont.render("równolegle do powierzchni ziemi", True, slategrey)
 
-        ''' screen.blit(Y_0Prompt, (50, (screen_height - 700) + v_xSurface.get_height()))'''
         screen.blit(v_xPrompt, (50, (screen_height - 630) + v_xSurface.get_height()))
         screen.blit(v_yPrompt, (50, (screen_height - 560) + v_ySurface.get_height()))
         screen.blit(m_pPrompt, (50, (screen_height - 490) + m_pSurface.get_height()))
@@ -1856,104 +1786,16 @@ def piaskownica():
                 pass
 
             clear()
-            jak_często = 1
+            jak_często = 100
             spin = 0  # spin = 1 odpalamy spinlauncha
             if spin != 1:
-                '''test = 1
-                while test == 1:
-                    #v_x0 = 100
-                    #v_y0 = 0
-                    v_x = v_x0
-                    v_y = v_y0
-                    if v_x0 >= 0:
-                        test = 0
-                    else:
-                        test = 1
-                test = 1
-                while test == 1:
-                    #f = f  # drag coeficient
-                    #M_Z = 5.98 * 10 ** 24  # masa planety
-                    #R_Z = 6371000  # promień planety
-                    if M_Z > 0 and R_Z > 0 and f > 0:
-                        test = 0
-                    else:
-                        test = 1
-                print('1')
-                test = 1
-                while test == 1:
-                    Y_location = R_Z + 30  # wysokość staartowa
-                    y_forplot[0] = Y_location
-                    R_xy = Y_location
-                    if Y_location - R_Z > 0:
-                        test = 0
-                    else:
-                        test = 1
-                print('2')
-                test = 1
-                while test == 1:
-                    m_r = m_r  # masa całej rakiety
-                    m_r_p = m_r  # nie zmieniamy
-                    m_m = m_r_p  # nie zmieniamy
-                    m_p = m_p  # masa paliwa - nie może być przecież większa od rakiety...
-                    if m_r * 0.9 - m_p >= 0:
-                        test = 0
-                    else:
-                        test = 1
-                print('3')
-                test = 1
-                while test == 1:
-                    #H_startu = 19  # wybieramy wysokość na kkórej mają zacząć pracować sylniki
-                    if H_startu >= 0:
-                        test = 0
-                    else:
-                        test = 1
-                print('4')
-                test = 1
-                while test == 1:
-                    tryb = 0  # tryb pracy silników optymalnie 0 - samonaprowadzający na orbitę,
-                    # 1 - siła ciągu działa wraz z trajektorią rakiety, 2 - sila ciągu zawsze działa równolegle do powierzchni ziemi
-                    if tryb == 0 or tryb == 1 or tryb == 2:
-                        test = 0
-                    else:
-                        test = 1
-                test = 1
-                while test == 1:
-                    jak_często = 1  # jeśli masz podejrzenie, że twój wykres będzie mały, zmniejsz (w przedziałach od 1 do 1000)
-                    if 1 <= jak_często <= 1000:
-                        test = 0
-                    else:
-                        test = 1'''
-                '''try:
-                                   update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1], v_xy_l[-1])
-                               except:
-                                   test = 1
-                                   a_y = -k * cos(X_location, Y_location) * R_xy ** (-2)
-                                   a_x = -k * sin(X_location, Y_location) * R_xy ** (-2)
-                                   a_t_x = 0.1
-                                   a_t_y = 0.1
-                                   pass
-                               print('7')
-                               obliczenia_numeryczne(2, 0, wysokość=H_startu, tryb_pracy_silników=0)  # II faza ruchu - z silnikami
-                               print('8')
-                               if test == 1:
-                                   try:
-                                       update_important_values(x_forplot[0], y_forplot[0], droga_l[0], listH_xy[0], a_xy_l[0], v_xy_l[0])
-                                   except:
-                                       print(x_forplot[0])
-                                       print(x_forplot[0], y_forplot[0])
-                                       print(x_forplot[0], y_forplot[0], droga_l[0])
-                                       print(x_forplot[0], y_forplot[0], droga_l[0], listH_xy[0])
-                                       print(x_forplot[0], y_forplot[0], droga_l[0], listH_xy[0], a_xy_l[0])
-                                       print(x_forplot[0], y_forplot[0], droga_l[0], listH_xy[0], a_xy_l[0], v_xy_l[0])
-                               update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1], v_xy_l[-1])'''  # stara obsługa błędów
-
                 print_important_values(2)
-                print('--------------------------')
+
                 obliczenia_numeryczne(1, 0, H_startu, 0)  # I faza ruchu - do odpalenia silników
                 if czy_faza1 == 1:
                     update_important_values(X_location, Y_location, droga, Hnpm / 1000, a_xy(a_x, a_y), v_xy(v_x, v_y))
                     test1 = 1
-                print('--------------------------')
+
                 obliczenia_numeryczne(2, 0, H_startu, 0)  # II faza ruchu - z silnikami
 
                 if test == 1:
@@ -1963,7 +1805,7 @@ def piaskownica():
                     update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1],
                                             v_xy_l[-1])
                     test = 0
-                print('--------------------------')
+
                 obliczenia_numeryczne(3, 0, H_startu, 0)  # III faza ruchu - po wyczerpaniu paliwa
 
                 wyświetlanie_wykresów(1, 1)  # 0 nie wyświetlam, 1 wyświetlam

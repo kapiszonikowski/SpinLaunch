@@ -3,11 +3,16 @@ import pygame
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Cursor, Slider
+import matplotlib.animation
+import time
+
+########################################################################################################################
 
 def przywracanie_do_poczatkowych():
     global M_Z, R_Z, G, V_1, x_0, y_00, y_0, k, Dt, f, S, m_m, v_g, m_r_p, jak_często, tryb_pracy_silników, v_x0,v_y0, m_p0, H_startu
     global droga, X_location, Y_location, R_xy, Hnpm, v_x, v_y, i, spin, m_r, m_p, Dm_1s, test, test1, czy_faza1, czy_faza2, czy_faza3
-    global x_forplot, x1_forplot, y_forplot, y1_forplot, listR_xy, listH_xy, listH_xy1, wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x, v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly
+    global x_forplot, x1_forplot, y_forplot, y1_forplot, listR_xy, listH_xy, listH_xy1, wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x, v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly, ro
+    global test0, test01, test02, test03
     # Stałe------------------------------------------------------------------------------------------------------------------
     M_Z = 5.98 * 10 ** 24  # masa ziemi
     R_Z = 6371000  # promień ziemi
@@ -50,6 +55,10 @@ def przywracanie_do_poczatkowych():
     czy_faza1 = 0
     czy_faza2 = 0
     czy_faza3 = 0
+    test0 = 0
+    test01 = 0
+    test02 = 0
+    test03 = 0
     x_forplot, x1_forplot = [x_0], [x_0]
     y_forplot, y1_forplot = [y_0], [y_0]
     listR_xy = [R_xy]  # potrzebne? -> TAK
@@ -59,7 +68,7 @@ def przywracanie_do_poczatkowych():
 
 przywracanie_do_poczatkowych()
 
-#funkcje do wykresu------------------------------------------------------------------------------------------------------
+#funkcje do wykresu-----------------------------------------------------------------------------------------------------
 def obliczanie_przyspieszenia(faza):
     global R_xy, v_x, X_location, Y_location, v_y, m_r, a_x, a_y, droga, Hnpm, a_t_x, a_t_y, a_x, jak_często
     if faza == 0:
@@ -416,12 +425,9 @@ def obliczenia_numeryczne(faza, p_important_values, wysokość, tryb_pracy_silni
             czy_faza1 = 1
             if p_important_values == 1 and i % jak_często == 0:
                 print_important_values(faza)
-            if Hnpm < 1000:
-                print_important_values(faza)
 
 
     if faza == 2:
-
         while m_p > 0 and R_Z < R_xy:
             if tryb_pracy_silników == 0:
                 naprowadzanie_na_orbite()
@@ -444,8 +450,7 @@ def obliczenia_numeryczne(faza, p_important_values, wysokość, tryb_pracy_silni
             czy_faza2 = 1
             if p_important_values == 1 and i % jak_często == 0:
                 print_important_values(faza)
-            if Hnpm < 1000:
-                print_important_values(faza)
+
 
     if faza == 3:
         while R_xy > R_Z:
@@ -468,8 +473,6 @@ def obliczenia_numeryczne(faza, p_important_values, wysokość, tryb_pracy_silni
             updates_appends(faza)
             czy_faza3 = 1
             if p_important_values == 1 and i % jak_często == 0:
-                print_important_values(faza)
-            if Hnpm < 1000:
                 print_important_values(faza)
 
 def prędkość_kosmiczna(R):
@@ -562,7 +565,6 @@ def print_ploted_data():
     print(v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly)
     print('---------------------------------------------------------------------------------')
 
-
 def wyświetlanie_wykresów(orbita, dane):
     # Tworzenie tekstu-------------------------------------------------------------------------------------------------------
     nd = round((droga / 1000), 2)
@@ -574,6 +576,8 @@ def wyświetlanie_wykresów(orbita, dane):
     napis_gazów = f'prędkość gazów wylotowych: {v_g}m\s'
     n = -0.8 * R_Z
     if orbita == 1:
+        plt.plot(range(10))
+        plt.figure(1)
         # ax, ax1 = plt.subplots()
         plt.axis('square')
         plt.plot(x_forplot, y_forplot, color='g', label='trajektoria rakiety')
@@ -587,12 +591,12 @@ def wyświetlanie_wykresów(orbita, dane):
         alfa = np.arange(0, np.pi * 2, 0.001)
         plt.plot(R_Z * np.cos(theta), R_Z * np.sin(theta), lw=2, color='b',
                  label='Ziemia')  # model ziemi
-        plt.plot((R_Z + 85000) * np.cos(alfa), (R_Z + 85000) * np.sin(alfa), color='y', lw=0.3)
+        plt.plot((R_Z + 85000) * np.cos(alfa), (R_Z + 85000) * np.sin(alfa), color='y', lw=0.3, label='Koniec atmosfery')
         try:
-            plt.scatter(wazny_x, wazny_y)  # początak i start działania silników
+            plt.scatter(wazny_x, wazny_y, label='Działanie silników')  # początak i start działania silników
         except:
             pass
-        plt.text(-0.2 * R_Z, 0.3 * R_Z, 'z tarciem', fontsize=10)
+        #plt.text(-0.2 * R_Z, 0.3 * R_Z, 'z tarciem', fontsize=10)
         plt.text(n, 0.2 * R_Z, napis_prędkości, fontsize=10)
         plt.text(n, 0.1 * R_Z, napis_paliwa, fontsize=10)
         plt.text(n, 0.0 * R_Z, napis_gazów, fontsize=10)
@@ -602,6 +606,13 @@ def wyświetlanie_wykresów(orbita, dane):
 
         ax = plt.subplot()
         cursor = Cursor(ax, horizOn=True, vertOn=True, linewidth=0.5, color='Black')
+
+        wm = plt.get_current_fig_manager()
+        wm.window.state('zoomed')
+        mng = plt.get_current_fig_manager()
+        mng.resize(*mng.window.maxsize())
+
+        matplotlib.pyplot.subplots_adjust(left=0.133, bottom=0.269, right=0.691, top=0.962, wspace=None, hspace=None)
 
         '''ax.subplots_adjust(bottom=0.25)
         axslider = ax.add_axes([0.1, 0.1, 0.6, 0.05])
@@ -613,9 +624,10 @@ def wyświetlanie_wykresów(orbita, dane):
 
         #figManager = plt.get_current_fig_manager()
         #figManager.window.showMaximized()
-        plt.show()
 
     if dane == 1:
+        plt.plot(range(10),  'ro-')
+        plt.figure(2)
         while len(droga_l) - len(d_a_ly) != 0:
             if len(droga_l) - len(d_a_ly) < 0:
                 d_a_ly.remove(d_a_ly[0])
@@ -635,8 +647,8 @@ def wyświetlanie_wykresów(orbita, dane):
                 if len(droga_l) - len(a_xy_l) > 0:
                     droga_l.remove(droga_l[0])
         plt.subplot(411)
-        plt.plot(droga_l, d_a_ly, color='r', lw=1, ls='-', label='daly ')
-        plt.plot(droga_l, d_a_lx, label='dalx')
+        plt.plot(droga_l, d_a_ly, color='r', lw=1, ls='-', label='Przyśp. oY oporów atm.')
+        plt.plot(droga_l, d_a_lx, label='Przyśp. oX oporów atm.')
         plt.legend()
         plt.xlabel('m')
         plt.ylabel('m/s^2')
@@ -645,10 +657,10 @@ def wyświetlanie_wykresów(orbita, dane):
         cursor1 = Cursor(aa, horizOn=True, vertOn=True, linewidth=0.5, color='Black')
 
         plt.subplot(412)
-        plt.plot(droga_l, a_xy_l, color='g', lw=3, ls='dotted', label='a_xy(d)')
-        plt.plot(droga_l, a_x_l, color='r', lw=1, ls='-', label='a_x(d)')
-        plt.plot(droga_l, a_y_l, color='y', lw=1, ls='-', label='a_y(d)')
-        plt.scatter(wazny_d, wazny_a, label='d_a_t')
+        plt.plot(droga_l, a_xy_l, color='g', lw=3, ls='dotted', label='Przyśp. Całkowite')
+        plt.plot(droga_l, a_x_l, color='r', lw=1, ls='-', label='Przyśp. na oX')
+        plt.plot(droga_l, a_y_l, color='y', lw=1, ls='-', label='Przyśp. na oY')
+        plt.scatter(wazny_d, wazny_a, label='Działanie silników')
         plt.legend()
         plt.xlabel('m')
         plt.ylabel('m/s^2')
@@ -657,10 +669,10 @@ def wyświetlanie_wykresów(orbita, dane):
         cursor2 = Cursor(ab, horizOn=True, vertOn=True, linewidth=0.5, color='Black')
 
         plt.subplot(413)
-        plt.plot(droga_l, v_xy_l, color='g', lw=3, ls='dotted', label='v_xy(d) [m/s]')
-        plt.plot(droga_l, v_x_l, color='r', lw=1, ls='-', label='v_x(d) [m/s]')
-        plt.plot(droga_l, v_y_l, color='y', lw=1, ls='-', label='v_y(d) [m/s]')
-        plt.scatter(wazny_d, wazny_v, label='d_v_t')
+        plt.plot(droga_l, v_xy_l, color='g', lw=3, ls='dotted', label='Prędkość Całk.')
+        plt.plot(droga_l, v_x_l, color='r', lw=1, ls='-', label='Prędkość na oX]')
+        plt.plot(droga_l, v_y_l, color='y', lw=1, ls='-', label='Prędkość na oY')
+        plt.scatter(wazny_d, wazny_v, label='Działanie silników')
         plt.legend()
         plt.xlabel('km')
         plt.ylabel('m/s)')
@@ -669,11 +681,15 @@ def wyświetlanie_wykresów(orbita, dane):
         cursor3 = Cursor(ac, horizOn=True, vertOn=True, linewidth=0.5, color='Black')
 
         plt.subplot(414)
-        x = np.linspace(0, max(droga_l), 100)
-        y = 0 * x + 100
-        plt.plot(x, y, color='b', lw=1, ls='--', label='koniec atmosfery')
-        plt.plot(droga_l, listH_xy, color='b', lw=1, ls='-', label='Hxy_(d) [km]')
-        plt.scatter(wazny_d, wazny_h, label='d_h_t')
+        if max(listH_xy) > 50:
+            plt.subplot(414)
+            x = np.linspace(0, max(droga_l), 100)
+            y = 0 * x + 100
+            plt.plot(x, y, color='b', lw=1, ls='--', label='koniec atmosfery')
+        else:
+            pass
+        plt.plot(droga_l, listH_xy, color='b', lw=1, ls='-', label='Wysokość nad pow.')
+        plt.scatter(wazny_d, wazny_h, label='Działanie silników')
         plt.legend()
         plt.xlabel('m')
         plt.ylabel('km')
@@ -681,10 +697,223 @@ def wyświetlanie_wykresów(orbita, dane):
         ad = plt.subplot(414)
         cursor4 = Cursor(ad, horizOn=True, vertOn=True, linewidth=0.5, color='Black')
 
-        #figManager = plt.get_current_fig_manager()
-        #figManager.window.showMaximized()
+        wm = plt.get_current_fig_manager()
+        wm.window.state('zoomed')
+        mng = plt.get_current_fig_manager()
+        mng.resize(*mng.window.maxsize())
+
+        matplotlib.pyplot.subplots_adjust(left=0.063, bottom=0.25, right=0.78, top=0.985, wspace=None, hspace=None)
+
         plt.show()
 
+def animated_plot():
+    global test0, test01, test02, test03
+    nd = round((droga / 1000), 2)
+    nw = round((max(listR_xy) - R_Z) / 1000, 2)
+    napis_drogi = f'droga przebyta przez ciao: {nd}km'
+    napis_wysokości = f'maksymalna wysokość ciała n.p.k: {nw}km'
+    napis_prędkości = f'początkowe prędkości ciał [km/s]: Vx = {round(v_x0 / 1000, 2)} ; Vy = {round(v_y0 / 1000, 2)}'
+    napis_paliwa = f'masa paliwa: {m_p}kg'
+    napis_gazów = f'prędkość gazów wylotowych: {v_g}m\s'
+    n = -0.8 * R_Z
+    fig, ax1 = plt.subplots()
+
+    plt.axis('square')
+    plt.xlim(-0.01 * R_Z, 0.3 * R_Z)
+    plt.ylim(0.8 * R_Z, 1.11 * R_Z)
+    theta = np.arange(0, np.pi * 2, 0.0001)
+    alfa = np.arange(0, np.pi * 2, 0.001)
+    ax1.plot(R_Z * np.cos(theta), R_Z * np.sin(theta), lw=2, color='b',
+             label='Ziemia')  # model ziemi
+    ax1.plot((R_Z + 85000) * np.cos(alfa), (R_Z + 85000) * np.sin(alfa), color='y', lw=0.3,
+             label='Koniec atmosfery')
+    ax1.text(n, 0.2 * R_Z, napis_prędkości, fontsize=10)
+    ax1.text(n, 0.1 * R_Z, napis_paliwa, fontsize=10)
+    ax1.text(n, 0.0 * R_Z, napis_gazów, fontsize=10)
+    plt.legend()
+    plt.xlabel('oś X')
+    plt.ylabel('oś Y')
+
+    line, = ax1.plot([], [], color='g', animated=True)
+    redline, = ax1.plot([], [], color='r', lw=0.5, animated=True)
+
+    x_data = []
+    y_data = []
+    x_data1 = []
+    y_data1 = []
+
+    x_forplot_animated, y_forplot_animated, x_1_a, y_1_a, droga_l_animated = [], [], [], [], []
+    dzielnik_punktow = 1
+
+    for q in range(len(x_forplot)):
+        if q % dzielnik_punktow == 0:
+            x_forplot_animated.append(x_forplot[q])
+            y_forplot_animated.append(y_forplot[q])
+            droga_l_animated.append(droga_l[q])
+
+    for q in range(len(x1_forplot)):
+        if q % dzielnik_punktow == 0:
+            x_1_a.append(x1_forplot[q])
+            y_1_a.append(y1_forplot[q])
+
+    print(len(x_forplot_animated), len(y_forplot_animated), len(droga_l_animated))
+
+    def rzut(t):
+        global test0, test01, test02, test03
+        try:
+            x_data.append(x_forplot_animated[t])
+            y_data.append(y_forplot_animated[t])
+        except:
+            pass
+
+        try:
+            x_data1.append(x_1_a[t])
+            y_data1.append(y_1_a[t])
+        except:
+            pass
+
+        if test0 == 0:
+            if test01 == 0:
+                if droga_l_animated[t] > droga1:
+                    test01 = 1
+                    try:
+                        plt.scatter(wazny_x[0], wazny_y[0], label='Odpalenie silników')  # początak i start działania silników
+                        plt.legend()
+                    except:
+                        pass
+            if test02 == 0:
+                if droga_l_animated[t] > droga2:
+                    test02 = 1
+                    test0 = 1
+                    try:
+                        plt.scatter(wazny_x[1], wazny_y[1], label='Wygaszenie silników')  # początak i start działania silników
+                        plt.legend()
+                    except:
+                        pass
+        else:
+            pass
+
+        line.set_data(x_data, y_data)
+        redline.set_data(x_data1, y_data1)
+        return line, redline
+
+    def rzut1():
+        global test0, test01, test02, test03
+        try:
+            line.set_data(x_data, y_data)
+            redline.set_data(x_data1, y_data1)
+        except:
+            pass
+        return line, redline
+
+    import matplotlib
+
+    anim = matplotlib.animation.FuncAnimation(fig, rzut, init_func=rzut1, blit=True, interval=2)
+    #anim = matplotlib.animation.FuncAnimation(fig, rzut, blit=True, interval=1)
+
+
+    wm = plt.get_current_fig_manager()
+    wm.window.state('zoomed')
+    mng = plt.get_current_fig_manager()
+    mng.resize(*mng.window.maxsize())
+
+    matplotlib.pyplot.subplots_adjust(left=0.133, bottom=0.269, right=0.691, top=0.962, wspace=None, hspace=None)
+
+    plt.show()
+
+def animated_plot_piaskownica():
+    global test0, test01, test02, test03
+    nd = round((droga / 1000), 2)
+    nw = round((max(listR_xy) - R_Z) / 1000, 2)
+    napis_drogi = f'droga przebyta przez ciao: {nd}km'
+    napis_wysokości = f'maksymalna wysokość ciała n.p.k: {nw}km'
+    napis_prędkości = f'początkowe prędkości ciał [km/s]: Vx = {round(v_x0 / 1000, 2)} ; Vy = {round(v_y0 / 1000, 2)}'
+    napis_paliwa = f'masa paliwa: {m_p}kg'
+    napis_gazów = f'prędkość gazów wylotowych: {v_g}m\s'
+    n = -0.8 * R_Z
+    fig, ax1 = plt.subplots()
+
+    plt.axis('square')
+    plt.xlim(-0.01 * R_Z, 0.3 * R_Z)
+    plt.ylim(0.8 * R_Z, 1.11 * R_Z)
+    theta = np.arange(0, np.pi * 2, 0.0001)
+    alfa = np.arange(0, np.pi * 2, 0.001)
+    ax1.plot(R_Z * np.cos(theta), R_Z * np.sin(theta), lw=2, color='b',
+             label='Ziemia')  # model ziemi
+    ax1.plot((R_Z + 85000) * np.cos(alfa), (R_Z + 85000) * np.sin(alfa), color='y', lw=0.3,
+             label='Koniec atmosfery')
+    ax1.text(n, 0.2 * R_Z, napis_prędkości, fontsize=10)
+    ax1.text(n, 0.1 * R_Z, napis_paliwa, fontsize=10)
+    ax1.text(n, 0.0 * R_Z, napis_gazów, fontsize=10)
+    plt.legend()
+    plt.xlabel('oś X')
+    plt.ylabel('oś Y')
+
+    line, = ax1.plot([], [], color='g', animated=True)
+
+    x_data = []
+    y_data = []
+
+    x_forplot_animated, y_forplot_animated, x_1_a, y_1_a, droga_l_animated = [], [], [], [], []
+    dzielnik_punktow = 1
+
+    for q in range(len(x_forplot)):
+        if q % dzielnik_punktow == 0:
+            x_forplot_animated.append(x_forplot[q])
+            y_forplot_animated.append(y_forplot[q])
+            droga_l_animated.append(droga_l[q])
+
+    print(len(x_forplot_animated), len(y_forplot_animated), len(droga_l_animated))
+
+    def rzut(t):
+        global test0, test01, test02, test03
+        try:
+            x_data.append(x_forplot_animated[t])
+            y_data.append(y_forplot_animated[t])
+        except:
+            pass
+
+        if test0 == 0:
+            if test01 == 0:
+                if droga_l_animated[t] > droga1:
+                    print(t)
+                    try:
+                        plt.scatter(wazny_x[0], wazny_y[0], label='Odpalenie silników')  # początak i start działania silników
+                        plt.legend()
+                    except:
+                        pass
+                    test01 = 1
+
+                if droga_l_animated[t] > droga2:
+                    print(t)
+                    test0 = 1
+                    try:
+                        plt.scatter(wazny_x[1], wazny_y[1], label='Wygaszenie silników')  # początak i start działania silników
+                        plt.legend()
+                    except:
+                        pass
+        else:
+            pass
+
+        line.set_data(x_data, y_data)
+        return line,
+
+    import matplotlib
+
+    anim = matplotlib.animation.FuncAnimation(fig, rzut, blit=True, interval=1)
+
+
+    wm = plt.get_current_fig_manager()
+    wm.window.state('zoomed')
+    mng = plt.get_current_fig_manager()
+    mng.resize(*mng.window.maxsize())
+
+    matplotlib.pyplot.subplots_adjust(left=0.133, bottom=0.269, right=0.691, top=0.962, wspace=None, hspace=None)
+
+    plt.show()
+
+
+########################################################################################################################
 
 pygame.init()
 
@@ -725,7 +954,6 @@ spinImg = pygame.transform.scale(spin, (400, 200))
 rocket = pygame.image.load('spinlaunch-2.jpg')
 rocketImg = pygame.transform.scale(rocket, (380, 200))
 
-
 # funkcja przycisku ----------------------------------------------------------------------------------------------------
 def create_button(x, y, width, height, hovercolor, defaultcolor):
     mouse = pygame.mouse.get_pos()
@@ -737,7 +965,7 @@ def create_button(x, y, width, height, hovercolor, defaultcolor):
     else:
         pygame.draw.rect(screen, defaultcolor, (x, y, width, height))
 
-# ekran 1. --------------------------------------------------------------------------------------------------------------
+# ekran 1. -------------------------------------------------------------------------------------------------------------
 def intro():
     title = titlefont.render("PROJEKT SPINLAUNCH", True, white)
     addtitle = font.render('czyli model wprowadzania satelity na orbitę', True, white)
@@ -770,7 +998,7 @@ def intro():
         clock.tick(15)
         return True
 
-# menu glowne------------------------------------------------------------------------------------------------------------
+# menu glowne-----------------------------------------------------------------------------------------------------------
 def menu():
     instruction = titlefont.render("WYBIERZ OPCJĘ", True, white)
     programText = font.render("TEORIA", True, white)
@@ -812,11 +1040,21 @@ def wybor_trybu():
     instruction = titlefont.render("WYBIERZ TRYB", True, white)
     programText = font.render("SPINLAUNCH", True, white)
     teoriaText = font.render("PIASKOWNICA", True, white)
+    back = littlefont.render('WSTECZ', True, white)
+
 
     while True:
         screen.fill((0, 0, 0))
         screen.blit(misteryImg, (0, 0))
         screen.blit(instruction, ((screen_width - instruction.get_width()) / 2, 50))
+
+        backButtton = create_button(100, screen_height * .9,
+                                    back.get_width() + 10, back.get_height(), blackish, royalblue)
+
+        screen.blit(back, (105, int(screen_height * .9)))
+
+        if backButtton:
+            menu()
 
         programButtton = create_button((screen_width/2)-150, int(screen_height * .33), 300, 50, blackish,royalblue)
 
@@ -847,8 +1085,10 @@ def wybor_trybu():
 # wprowadzanie danych---------------------------------------------------------------------------------------------------
 def data_input():
     global test, R_xy, v_x0, v_y0, jak_często, v_x, X_location, Y_location, v_y, m_r, droga, Hnpm, i, x_forplot, x1_forplot, y_forplot, y1_forplot, droga_l, listH_xy, listH_xy1, listR_xy, v_xy_l, v_x_l, v_y_l, a_xy_l, a_x_l, a_y_l, m_p, H_startu, tryb_pracy_silników
+    global droga1, droga2
     przywracanie_do_poczatkowych()
     title_text = font.render("WPROWADŹ NASTĘPUJĄCE PARAMETRY", True, gold)
+    back = littlefont.render('WSTECZ', True, white)
     vv_x = ''
     vv_y = ''
     mm_p = ''
@@ -856,7 +1096,7 @@ def data_input():
     t0='0'
     t1 = '1'
     t2 = '2'
-    YY_0 = ''
+    #YY_0 = ''
     v_xActive = False
     v_yActive = False
     m_pActive = False
@@ -875,6 +1115,13 @@ def data_input():
         screen.blit(misteryImg, (0, 0))
         screen.blit(title_text, (40, 20))
 
+        backButtton = create_button(100, screen_height * .9,
+                                    back.get_width() + 10, back.get_height(), blackish, royalblue)
+
+        screen.blit(back, (105, int(screen_height * .9)))
+
+        if backButtton:
+            wybor_trybu()
         # v_x
         v_xSurface = littlefont.render(vv_x, True, white)
         v_xBorder = pygame.Rect(650, screen_height - 620,
@@ -1065,17 +1312,17 @@ def data_input():
 
         if v_xActive:
             pygame.draw.rect(screen, white, v_xBorder, 2)
-            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m]", True, white)
+            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m/s]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, v_xBorder, 2)
-            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m]", True, slategrey)
+            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m/s]", True, slategrey)
 
         if v_yActive:
             pygame.draw.rect(screen, white, v_yBorder, 2)
-            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m]", True, white)
+            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m/s]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, v_yBorder, 2)
-            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m]", True, slategrey)
+            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m/s]", True, slategrey)
 
         if m_pActive:
             pygame.draw.rect(screen, white, m_pBorder, 2)
@@ -1135,8 +1382,8 @@ def data_input():
         screen.blit(ready, ((screen_width / 2) - (ready.get_width() / 2) + 5, int(screen_height * .9)))
 
         if readyButtton:
-            if YY_0 != "":
-                Y_location = float(YY_0)
+            #if YY_0 != "":
+                #Y_location = float(YY_0)
             if vv_x != "":
                 v_x = float(vv_x)
                 v_x0 = float(vv_x)
@@ -1155,7 +1402,7 @@ def data_input():
                 tryb_pracy_silników = 2
             else:
                 pass
-
+            print( v_x0, v_y0, Y_location, H_startu, tryb_pracy_silników)
             spin = 1  # spin = 1 odpalamy spinlauncha
             if spin == 1:
 
@@ -1169,9 +1416,9 @@ def data_input():
                 if Hnpm > H_startu:
                     update_important_values(X_location, Y_location, droga, Hnpm / 1000, a_xy(a_x, a_y), v_xy(v_x, v_y))
                     test1 = 1
+                droga1 = droga
 
                 obliczenia_numeryczne(2, 0, H_startu, 0)  # II faza ruchu - z silnikami
-
                 if test == 1:
                     if test1 == 0:
                         update_important_values(x_forplot[1], y_forplot[1], droga_l[1], listH_xy[1], a_xy_l[1],
@@ -1179,9 +1426,14 @@ def data_input():
                     update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1],
                                             v_xy_l[-1])
                     test = 0
+                droga2 = droga
 
                 obliczenia_numeryczne(3, 0, H_startu, 0)  # III faza ruchu - po wyczerpaniu paliwa
 
+                x_forplot.remove(x_forplot[0])
+                y_forplot.remove(y_forplot[0])
+
+                animated_plot()
                 wyświetlanie_wykresów(1, 1)  # 0 nie wyświetlam, 1 wyświetlam
                 clear()
 
@@ -1190,18 +1442,24 @@ def data_input():
         clock.tick(15)
 
 # piaskownica-----------------------------------------------------------------------------------------------------------
+
 def wlasciwosci_planety():
-    global test, y_0, R_xy, v_x0, v_y0, jak_często, v_x, X_location, Y_location, v_y, m_r, droga, Hnpm, i, x_forplot, x1_forplot, y_forplot, y1_forplot, droga_l, listH_xy, listH_xy1, listR_xy, v_xy_l, v_x_l, v_y_l, a_xy_l, a_x_l, a_y_l, m_p, H_startu, tryb_pracy_silników
-    global f, M_Z, R_Z, y_00, test1, k, m_p0, Dt
-    global MM_Z, RR_Z, DDt, jjak_często, ddensity
+    global M_Z, R_Z, G, V_1, x_0, y_00, y_0, k, Dt, f, S, m_m, v_g, m_r_p, jak_często, tryb_pracy_silników, v_x0, v_y0, m_p0, H_startu
+    global droga, X_location, Y_location, R_xy, Hnpm, v_x, v_y, i, spin, m_r, m_p, Dm_1s, test, test1, czy_faza1, czy_faza2, czy_faza3
+    global x_forplot, x1_forplot, y_forplot, y1_forplot, listR_xy, listH_xy, listH_xy1, wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x, v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly, ro
+    global MM_Z, RR_Z, DDt, jjak_często, ddensity, YY_1, HH_startu1, vv_x1
     przywracanie_do_poczatkowych()
     title_text = font.render("WŁAŚCIWOŚCI PLANETY", True, gold)
-
+    title1_text = font.render("WYBÓR OPCJI DOMYŚLNEJ", True, gold)
     MM_Z = ''
     RR_Z = ''
     DDt = ''
     jjak_często = ''
     ddensity = ''
+    YY_1 = '20'
+    HH_startu1 = ''
+    vv_x1 = ''
+
 
     M_ZActive = False
     R_ZActive = False
@@ -1210,6 +1468,18 @@ def wlasciwosci_planety():
     densityActive = False
 
     ready = font.render("Dalej", True, white)
+    back = littlefont.render('WSTECZ', True, white)
+
+    ksiezycText = font.render("KSIĘŻYC", True, white)
+    merkuryText = font.render("MERKURY", True, white)
+    wenusText = font.render("WENUS", True, white)
+    marsText = font.render("MARS", True, white)
+    jowiszText = font.render("JOWISZ", True, white)
+    saturnText = font.render("SATURN", True, white)
+    uranText = font.render("URAN", True, white)
+    neptunText = font.render("NEPTUN", True, white)
+    plutonText = font.render("PLUTON", True, white)
+    surrealizmText = font.render("SURREALIZM", True, white)
 
     while True:
 
@@ -1217,6 +1487,109 @@ def wlasciwosci_planety():
         screen.fill((0, 0, 0))
         screen.blit(misteryImg, (0, 0))
         screen.blit(title_text, (40,20))
+        screen.blit(title1_text, (880, 20))
+
+        # surrealizm
+        surrealizmButtton = create_button(880, int(screen_height - 700), 300, 50, blackish, royalblue)
+        if surrealizmButtton:
+            MM_Z = "24"
+            RR_Z = "6"
+            HH_startu1 = '200000'
+            vv_x1 = '60000'
+            # DDt = 0
+            jjak_często = '1'
+            # ddensity = 0
+        screen.blit(surrealizmText, (900, int(screen_height - 700) + 7))
+
+        # ksiezyc
+        ksiezycButtton = create_button(880, int(screen_height - 640), 300, 50, blackish, royalblue)
+        if ksiezycButtton:
+            MM_Z = "0.0735"
+            RR_Z = "1738"
+            # DDt = 0
+            # jjak_często = 0
+            # ddensity = 0
+        screen.blit(ksiezycText, (900, int(screen_height - 640) + 7))
+
+        # merkury
+        merkuryButtton = create_button(880, int(screen_height - 580), 300, 50, blackish, royalblue)
+        if merkuryButtton:
+            MM_Z = "0.33"
+            RR_Z = "2439.7"
+            # DDt = 0
+            # jjak_często = 0
+            # ddensity = 0
+        screen.blit(merkuryText, (900, int(screen_height - 580) + 7))
+
+        # wenus
+        wenusButtton = create_button(880, int(screen_height - 520), 300, 50, blackish, royalblue)
+        if wenusButtton:
+            MM_Z = "4.87"
+            RR_Z = "6051.8"
+            # DDt = 0
+            # jjak_często = 0
+            # ddensity = 0
+        screen.blit(wenusText, (900, int(screen_height - 520) + 7))
+
+        # mars
+        marsButtton = create_button(880, int(screen_height - 460), 300, 50, blackish, royalblue)
+        if marsButtton:
+            MM_Z = "0.64"
+            RR_Z = "3389.4"
+            # DDt = 0
+            # jjak_często = 0
+            # ddensity = 0
+        screen.blit(marsText, (900, int(screen_height - 460) + 7))
+
+        # jowisz
+        jowiszButtton = create_button(880, int(screen_height - 400), 300, 50, blackish, royalblue)
+        if jowiszButtton:
+            MM_Z = "1900"
+            RR_Z = "69909"
+            # DDt = 0
+            # jjak_często = 0
+            # ddensity = 0
+        screen.blit(jowiszText, (900, int(screen_height - 400) + 7))
+
+        # saturn
+        saturnButtton = create_button(880, int(screen_height - 340), 300, 50, blackish, royalblue)
+        if saturnButtton:
+            MM_Z = "569"
+            RR_Z = "58231"
+            # DDt = 0
+            # jjak_często = 0
+            # ddensity = 0
+        screen.blit(saturnText, (900, int(screen_height - 340) + 7))
+
+        # uran
+        uranButtton = create_button(880, int(screen_height - 280), 300, 50, blackish, royalblue)
+        if uranButtton:
+            MM_Z = '86.8'
+            RR_Z = '25362'
+            # DDt = 0
+            # jjak_często = 0
+            # ddensity = 0
+        screen.blit(uranText, (900, int(screen_height - 280) + 7))
+
+        # neptun
+        neptunButtton = create_button(880, int(screen_height - 220), 300, 50, blackish, royalblue)
+        if neptunButtton:
+            MM_Z = '102.4'
+            RR_Z = '24622'
+            # DDt = 0
+            # jjak_często = 0
+            # ddensity = 0
+        screen.blit(neptunText, (900, int(screen_height - 220) + 7))
+
+        # pluton
+        plutonButtton = create_button(880, int(screen_height - 160), 300, 50, blackish, royalblue)
+        if plutonButtton:
+            MM_Z = '0.013'
+            RR_Z = '1188'
+            # DDt = 0
+            # jjak_często = 0
+            # ddensity = 0
+        screen.blit(plutonText, (900, int(screen_height - 160) + 7))
 
         # M_Z
         M_ZSurface = littlefont.render(MM_Z, True, white)
@@ -1368,10 +1741,10 @@ def wlasciwosci_planety():
 
         if M_ZActive:
             pygame.draw.rect(screen, white, M_ZBorder, 2)
-            M_ZPrompt = littlefont.render("MASA PLANETY (10^24 KG)", True, white)
+            M_ZPrompt = littlefont.render("MASA PLANETY [10^24 KG]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, M_ZBorder, 2)
-            M_ZPrompt = littlefont.render("MASA PLANETY (10^24 KG)", True, slategrey)
+            M_ZPrompt = littlefont.render("MASA PLANETY [10^24 KG]", True, slategrey)
 
         if R_ZActive:
             pygame.draw.rect(screen, white, R_ZBorder, 2)
@@ -1382,10 +1755,10 @@ def wlasciwosci_planety():
 
         if densityActive:
             pygame.draw.rect(screen, white, densityBorder, 2)
-            densityPrompt = littlefont.render("GĘSTOŚĆ ATMOSFERY (kg/dm^3)", True, white)
+            densityPrompt = littlefont.render("GĘSTOŚĆ ATMOSFERY [kg/dm^3]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, densityBorder, 2)
-            densityPrompt = littlefont.render("GĘSTOŚĆ ATMOSFERY (kg/dm^3)", True, slategrey)
+            densityPrompt = littlefont.render("GĘSTOŚĆ ATMOSFERY [kg/dm^3]", True, slategrey)
 
         if jak_częstoActive:
             pygame.draw.rect(screen, white, jak_częstoBorder, 2)
@@ -1415,62 +1788,26 @@ def wlasciwosci_planety():
         screen.blit(ready, (1400 - 195, int(screen_height * .9)))
 
         if readyButtton:
-            print(MM_Z, RR_Z, DDt, jjak_często, ddensity)
             wlasciwosci_rakiety()
-        '''
-        if readyButtton:
-            if MM_Z != "":
-                M_Z = float(MM_Z)*10**24
-                k = G * M_Z
-            if RR_Z != "":
-                R_Z = float(RR_Z)*1000
-            if ddensity != "":
-                print(ddensity)
-            if jjak_często != "":
-                jak_często = float(jjak_często)
-            if DDt != "":
-                Dt = float(DDt)
-            else:
-                pass
 
-            clear()
-            jak_często = 1
-            spin = 0  # spin = 1 odpalamy spinlauncha
-            if spin != 1:
-                print_important_values(2)
-                print('--------------------------')
-                obliczenia_numeryczne(1, 0, H_startu, 0)  # I faza ruchu - do odpalenia silników
-                if czy_faza1 == 1:
-                    update_important_values(X_location, Y_location, droga, Hnpm / 1000, a_xy(a_x, a_y), v_xy(v_x, v_y))
-                    test1 = 1
-                print('--------------------------')
-                obliczenia_numeryczne(2, 0, H_startu, 0)  # II faza ruchu - z silnikami
+        backButtton = create_button(100, screen_height * .9,
+                                     back.get_width() + 10, back.get_height(), blackish, royalblue)
 
-                if test == 1:
-                    if test1 == 0:
-                        update_important_values(x_forplot[1], y_forplot[1], droga_l[1], listH_xy[1], a_xy_l[1],
-                                                v_xy_l[1])
-                    update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1],
-                                            v_xy_l[-1])
-                    test = 0
-                print('--------------------------')
-                obliczenia_numeryczne(3, 0, H_startu, 0)  # III faza ruchu - po wyczerpaniu paliwa
+        screen.blit(back, (105, int(screen_height * .9)))
 
-                wyświetlanie_wykresów(1, 1)  # 0 nie wyświetlam, 1 wyświetlam
-                clear()
-                '''
+        if backButtton:
+            wybor_trybu()
 
         pygame.display.update()
         clock.tick(15)
 
 def wlasciwosci_rakiety():
-    global test, R_xy, v_x0, v_y0, jak_często, v_x, X_location, Y_location, v_y, m_r, droga, Hnpm, i, x_forplot, x1_forplot, \
-    y_forplot, y1_forplot, droga_l, listH_xy, listH_xy1, listR_xy, v_xy_l, v_x_l, v_y_l, a_xy_l, a_x_l, a_y_l, \
-    m_p, H_startu, tryb_pracy_silników, v_g, m_r_p, Dt, R_Z
-    global MM_Z, RR_Z, DDt, jjak_często, ddensity
-    global f, M_Z, R_Z, y_00, test1, k, m_p0, ro
+    global M_Z, R_Z, G, V_1, x_0, y_00, y_0, k, Dt, f, S, m_m, v_g, m_r_p, jak_często, tryb_pracy_silników, v_x0, v_y0, m_p0, H_startu
+    global droga, X_location, Y_location, R_xy, Hnpm, v_x, v_y, i, spin, m_r, m_p, Dm_1s, test, test1, czy_faza1, czy_faza2, czy_faza3
+    global x_forplot, x1_forplot, y_forplot, y1_forplot, listR_xy, listH_xy, listH_xy1, wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x, v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly, ro
+    global MM_Z, RR_Z, DDt, jjak_często, ddensity, droga1, droga2, YY_1, vv_x1, HH_startu1
     title_text = font.render("WPROWADŹ NASTĘPUJĄCE PARAMETRY", True, gold)
-    print(MM_Z, RR_Z, DDt, jjak_często, ddensity)
+    back = littlefont.render('WSTECZ', True, white)
     przywracanie_do_poczatkowych()
     YY_0 = ''
     vv_x = ''
@@ -1506,6 +1843,18 @@ def wlasciwosci_rakiety():
         screen.blit(misteryImg, (0, 0))
         screen.blit(title_text, (40, 20))
 
+        backButtton = create_button(100, screen_height * .9,
+                                    back.get_width() + 10, back.get_height(), blackish, royalblue)
+
+        screen.blit(back, (105, int(screen_height * .9)))
+
+        if backButtton:
+            wlasciwosci_planety()
+
+        if HH_startu1 != '':
+            YY_0 = HH_startu1
+        if vv_x1 != '':
+            vv_x = vv_x1
         #Y_0
         Y_0Surface = littlefont.render(YY_0, True, white)
         Y_0Border = pygame.Rect(650, screen_height - 690,
@@ -1790,7 +2139,7 @@ def wlasciwosci_rakiety():
                         vv_y = vv_y[:-1]
                     if event.key == pygame.K_1 or event.key == pygame.K_2 or event.key == pygame.K_3 or event.key == pygame.K_4 or event.key == pygame.K_5 \
                             or event.key == pygame.K_6 or event.key == pygame.K_7 or event.key == pygame.K_8 or event.key == pygame.K_9 or event.key == pygame.K_0 \
-                            or event.key == pygame.K_PERIOD:
+                            or event.key == pygame.K_PERIOD or event.key == pygame.K_MINUS:
                         vv_y += event.unicode
                     else:
                         pass
@@ -1855,17 +2204,17 @@ def wlasciwosci_rakiety():
 
         if v_xActive:
             pygame.draw.rect(screen, white, v_xBorder, 2)
-            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m]", True, white)
+            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m/s]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, v_xBorder, 2)
-            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m]", True, slategrey)
+            v_xPrompt = littlefont.render("POZIOMA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m/s]", True, slategrey)
 
         if v_yActive:
             pygame.draw.rect(screen, white, v_yBorder, 2)
-            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m]", True, white)
+            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m/s]", True, white)
         else:
             pygame.draw.rect(screen, slategrey, v_yBorder, 2)
-            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m]", True, slategrey)
+            v_yPrompt = littlefont.render("PIONOWA WSPÓŁRZĘDNA PRĘDKOŚCI POCZĄTKOWEJ [m/s]", True, slategrey)
 
         if m_pActive:
             pygame.draw.rect(screen, white, m_pBorder, 2)
@@ -1972,16 +2321,36 @@ def wlasciwosci_rakiety():
             if RR_Z != "":
                 R_Z = float(RR_Z) * 1000
             if YY_0 != "":
-                y_00 = float(YY_0)
+                if YY_0 == '0':
+                    y_00 = 0.01
+                    y_0 = R_Z + y_00
+                    Y_location = y_0
+                    R_xy = np.sqrt(X_location**2 + Y_location**2)
+                    Hnpm = R_xy - R_Z
+                    x_forplot = [x_0]
+                    y_forplot = [y_0]
+                else:
+                    y_00 = float(YY_0)
+                    y_0 = R_Z + y_00
+                    Y_location = y_0
+                    R_xy = np.sqrt(X_location ** 2 + Y_location ** 2)
+                    Hnpm = R_xy - R_Z
+                    x_forplot = [x_0]
+                    y_forplot = [y_0]
+            else:
+                y_00 = float(YY_1)
                 y_0 = R_Z + y_00
                 Y_location = y_0
+                R_xy = np.sqrt(X_location ** 2 + Y_location ** 2)
+                Hnpm = R_xy - R_Z
+                x_forplot = [x_0]
+                y_forplot = [y_0]
             if ddensity != '':
                 ro = float(ddensity)
             if jjak_często != '':
                 jak_często = float(jjak_często)
             if DDt != '':
                 Dt = float(DDt)
-
             if t0Active != False:
                 tryb_pracy_silników = 0
             if t1Active != False:
@@ -1992,15 +2361,15 @@ def wlasciwosci_rakiety():
                 pass
 
             print(Y_location, v_x, v_y, m_p, H_startu, f, v_g, m_r, M_Z, R_Z, jak_często, Dt, ro)
-
             spin = 0  # spin = 1 odpalamy spinlauncha
             if spin != 1:
-                print_important_values(2)
                 print('--------------------------')
-                obliczenia_numeryczne(1, 0, H_startu, tryb_pracy_silników)  # I faza ruchu - do odpalenia silników
+                obliczenia_numeryczne(1, 1, H_startu, tryb_pracy_silników)  # I faza ruchu - do odpalenia silników
                 if czy_faza1 == 1:
                     update_important_values(X_location, Y_location, droga, Hnpm / 1000, a_xy(a_x, a_y), v_xy(v_x, v_y))
                     test1 = 1
+
+                droga1 = droga
                 print('--------------------------')
                 obliczenia_numeryczne(2, 0, H_startu, tryb_pracy_silników)  # II faza ruchu - z silnikami
 
@@ -2011,9 +2380,13 @@ def wlasciwosci_rakiety():
                     update_important_values(x_forplot[-1], y_forplot[-1], droga_l[-1], listH_xy[-1], a_xy_l[-1],
                                             v_xy_l[-1])
                     test = 0
+                droga2 = droga
                 print('--------------------------')
                 obliczenia_numeryczne(3, 0, H_startu, tryb_pracy_silników)  # III faza ruchu - po wyczerpaniu paliwa
 
+                x_forplot.remove(x_forplot[0])
+                y_forplot.remove(y_forplot[0])
+                animated_plot_piaskownica()
                 wyświetlanie_wykresów(1, 1)  # 0 nie wyświetlam, 1 wyświetlam
                 clear()
 
@@ -2026,6 +2399,7 @@ def teoria():
     title_text = titlefont.render("TEORIA", True, gold)
 
     next = littlefont.render("DALEJ", True, white)
+    back = littlefont.render('WSTECZ', True, white)
 
     while True:
         screen.fill((0, 0, 0))
@@ -2057,6 +2431,7 @@ def spinlaunch_info():
     title_text = titlefont.render("O SPINLAUNCHU", True, gold)
 
     next = littlefont.render("DALEJ", True, white)
+    back = littlefont.render('WSTECZ', True, white)
 
     while True:
         screen.fill((0, 0, 0))
@@ -2090,6 +2465,7 @@ def parametry():
     title_text = titlefont.render("PARAMETRY STAŁE", True, gold)
 
     next = littlefont.render("DALEJ", True, white)
+    back = littlefont.render('WSTECZ', True, white)
 
     while True:
         screen.fill((0, 0, 0))
@@ -2177,7 +2553,7 @@ def oknowyboru():
                 running = False
                 pygame.display.quit()
 
-
+########################################################################################################################
 
 pygame.init()
 oknowyboru()

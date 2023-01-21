@@ -607,23 +607,9 @@ def wyświetlanie_wykresów(orbita, dane):
         ax = plt.subplot()
         cursor = Cursor(ax, horizOn=True, vertOn=True, linewidth=0.5, color='Black')
 
-        wm = plt.get_current_fig_manager()
-        wm.window.state('zoomed')
-        mng = plt.get_current_fig_manager()
-        mng.resize(*mng.window.maxsize())
+        get_fullscreen()
 
         matplotlib.pyplot.subplots_adjust(left=0.133, bottom=0.269, right=0.691, top=0.962, wspace=None, hspace=None)
-
-        '''ax.subplots_adjust(bottom=0.25)
-        axslider = ax.add_axes([0.1, 0.1, 0.6, 0.05])
-        slider = Slider(ax=axslider, label="Time", valmin=0, valmax=i-1, valstep=1)
-        def update(indx):
-            ax1.scatter(x_forplot[indx], y_forplot[indx], color='Black')
-        ax.canvas.draw_idle()
-        slider.on_changed(update)'''
-
-        #figManager = plt.get_current_fig_manager()
-        #figManager.window.showMaximized()
 
     if dane == 1:
         plt.plot(range(10),  'ro-')
@@ -697,10 +683,7 @@ def wyświetlanie_wykresów(orbita, dane):
         ad = plt.subplot(414)
         cursor4 = Cursor(ad, horizOn=True, vertOn=True, linewidth=0.5, color='Black')
 
-        wm = plt.get_current_fig_manager()
-        wm.window.state('zoomed')
-        mng = plt.get_current_fig_manager()
-        mng.resize(*mng.window.maxsize())
+        get_fullscreen()
 
         matplotlib.pyplot.subplots_adjust(left=0.063, bottom=0.25, right=0.78, top=0.985, wspace=None, hspace=None)
 
@@ -811,11 +794,7 @@ def animated_plot():
     anim = matplotlib.animation.FuncAnimation(fig, rzut, init_func=rzut1, blit=True, interval=2)
     #anim = matplotlib.animation.FuncAnimation(fig, rzut, blit=True, interval=1)
 
-
-    wm = plt.get_current_fig_manager()
-    wm.window.state('zoomed')
-    mng = plt.get_current_fig_manager()
-    mng.resize(*mng.window.maxsize())
+    get_fullscreen()
 
     matplotlib.pyplot.subplots_adjust(left=0.133, bottom=0.269, right=0.691, top=0.962, wspace=None, hspace=None)
 
@@ -863,8 +842,6 @@ def animated_plot_piaskownica():
             y_forplot_animated.append(y_forplot[q])
             droga_l_animated.append(droga_l[q])
 
-    print(len(x_forplot_animated), len(y_forplot_animated), len(droga_l_animated))
-
     def rzut(t):
         global test0, test01, test02, test03
         try:
@@ -898,19 +875,19 @@ def animated_plot_piaskownica():
         line.set_data(x_data, y_data)
         return line,
 
-    import matplotlib
-
     anim = matplotlib.animation.FuncAnimation(fig, rzut, blit=True, interval=1)
 
-
-    wm = plt.get_current_fig_manager()
-    wm.window.state('zoomed')
-    mng = plt.get_current_fig_manager()
-    mng.resize(*mng.window.maxsize())
+    get_fullscreen()
 
     matplotlib.pyplot.subplots_adjust(left=0.133, bottom=0.269, right=0.691, top=0.962, wspace=None, hspace=None)
 
     plt.show()
+
+def get_fullscreen():
+    wm = plt.get_current_fig_manager()
+    wm.window.state('zoomed')
+    mng = plt.get_current_fig_manager()
+    mng.resize(*mng.window.maxsize())
 
 
 ########################################################################################################################

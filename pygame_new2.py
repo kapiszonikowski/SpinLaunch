@@ -24,7 +24,7 @@ def przywracanie_do_poczatkowych():
     k = G * M_Z  # wsp staej grawitacji
     Dt = 0.01  # czas aktualizacji
     # alpha = nu.angle(0, deg=True)
-    f = 0.125  # Drag coefficient for rocket
+    f = 0.12  # Drag coefficient for rocket
     S = np.pi * 0.5 ** 2  # Rocket cross-section
     m_m = 10300  # masa całego modułu
     v_g = 8750  # prędkość gazów wylotowych

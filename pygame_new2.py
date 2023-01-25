@@ -203,11 +203,11 @@ def updates_appends(faza):
         R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
         Hnpm = R_xy - R_Z
 
-
         if Hnpm >= 1000 and i % jak_często == 0:
             x1_forplot.append(X_location)
             y1_forplot.append(Y_location)
             listH_xy1.append(Hnpm)
+            droga = droga + ((x1_forplot[-1] - x1_forplot[-2]) ** 2 + (y1_forplot[-1] - y1_forplot[-2]) ** 2) ** 0.5
 
         if Hnpm < 1000:
             x1_forplot.append(X_location)
@@ -216,6 +216,7 @@ def updates_appends(faza):
             R_xy = (X_location ** 2 + Y_location ** 2) ** 0.5
             Hnpm = R_xy - R_Z
             listH_xy1.append(Hnpm)
+            droga = droga + ((x1_forplot[-1] - x1_forplot[-2]) ** 2 + (y1_forplot[-1] - y1_forplot[-2]) ** 2) ** 0.5
 
     if faza == 1:
         v_x = v_x + a_x * Dt  # x-speed update
@@ -416,6 +417,9 @@ def obliczenia_numeryczne(faza, p_important_values, wysokość, tryb_pracy_silni
             if p_important_values == 1 and i % jak_często == 0:
                 print_important_values(faza)
 
+            if droga > 8 * 6371000:
+                break
+
     if faza == 1:
         while Hnpm < wysokość and R_xy > R_Z:
             obliczanie_przyspieszenia(faza)
@@ -532,13 +536,14 @@ def print_important_values(faza):
             f'Location (x,y): {[round(X_location, 0), round(Y_location)]}[m] || H: {Hnpm}[m] ||  t: {round(i / 3600000, 2)}[s]')
 
 def reset_xyv():
-    global v_x, v_y, X_location, Y_location, R_xy, v_x0, v_y0, x_0, y_0, Hnpm, R_Z
+    global v_x, v_y, X_location, Y_location, R_xy, v_x0, v_y0, x_0, y_0, Hnpm, R_Z, droga
     v_x = v_x0
     v_y = v_y0
     X_location = x_0
     Y_location = y_0
     R_xy = y_0
     Hnpm = R_xy - R_Z
+    droga = 0
 
 def clear():
     global m_r, m_p, droga, X_location, Y_location, R_xy, Hnpm,  i, x_forplot, x1_forplot, y_forplot, y1_forplot, listR_xy, listH_xy, listH_xy1, wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x, v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly
@@ -654,7 +659,7 @@ def wyświetlanie_wykresów(orbita, dane):
 
         plt.subplot(413)
         plt.plot(droga_l, v_xy_l, color='g', lw=3, ls='dotted', label='Prędkość Całk.')
-        plt.plot(droga_l, v_x_l, color='r', lw=1, ls='-', label='Prędkość na oX]')
+        plt.plot(droga_l, v_x_l, color='r', lw=1, ls='-', label='Prędkość na oX')
         plt.plot(droga_l, v_y_l, color='y', lw=1, ls='-', label='Prędkość na oY')
         plt.scatter(wazny_d, wazny_v, label='Działanie silników')
         plt.legend()
@@ -897,7 +902,6 @@ clock = pygame.time.Clock()
 screen_width = 1520
 screen_height = 800
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-# screen = pygame.display.set_mode([1520,800])
 pygame.display.set_caption("spinlaunch")
 
 # zmienne
@@ -920,9 +924,7 @@ spinlaunchImg = pygame.image.load("SpinLaunch.logo.jpg")
 misteryImg = pygame.image.load('mistery.jpg')
 infoImg = pygame.image.load('ospinlaunchu.png')
 spinImg = pygame.image.load('spin.jpg')
-#spinImg = pygame.transform.scale(spin, (400, 200))
 rocketImg = pygame.image.load('spinlaunch-2.jpg')
-#rocketImg = pygame.transform.scale(rocket, (380, 200))
 numImg = pygame.image.load('metodanum.png')
 wzoryImg = pygame.image.load('wzory.png')
 wrefImg = pygame.image.load('wartosciref.png')
@@ -1063,7 +1065,6 @@ def data_input():
     t0='0'
     t1 = '1'
     t2 = '2'
-    #YY_0 = ''
     v_xActive = False
     v_yActive = False
     m_pActive = False
@@ -1101,13 +1102,13 @@ def data_input():
         v_ySurface = littlefont.render(vv_y, True, white)
         v_yBorder = pygame.Rect(650, screen_height - 630,
                                 v_ySurface.get_width() + 10, 40)
-        screen.blit(v_ySurface, (655, screen_height - 610))
+        screen.blit(v_ySurface, (655, screen_height - 620))
 
         # m_p
         m_pSurface = littlefont.render(mm_p, True, white)
         m_pBorder = pygame.Rect(650, screen_height - 560,
                                 m_pSurface.get_width() + 10, 40)
-        screen.blit(m_pSurface, (655, screen_height - 540))
+        screen.blit(m_pSurface, (655, screen_height - 550))
 
         # H_startu
         H_startuSurface = littlefont.render(HH_startu, True, white)
@@ -1143,31 +1144,26 @@ def data_input():
                     sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if v_xBorder.collidepoint(event.pos):
-                    Y_0Active = False
                     v_xActive = True
                     v_yActive = False
                     m_pActive = False
                     H_startuActive = False
                 if v_yBorder.collidepoint(event.pos):
-                    Y_0Active = False
                     v_xActive = False
                     v_yActive = True
                     m_pActive = False
                     H_startuActive = False
                 if m_pBorder.collidepoint(event.pos):
-                    Y_0Active = False
                     v_xActive = False
                     v_yActive = False
                     m_pActive = True
                     H_startuActive = False
                 if H_startuBorder.collidepoint(event.pos):
-                    Y_0Active = False
                     v_xActive = False
                     v_yActive = False
                     m_pActive = False
                     H_startuActive = True
                 if t0Border.collidepoint(event.pos):
-                    Y_0Active = False
                     v_xActive = False
                     v_yActive = False
                     m_pActive = False
@@ -1176,7 +1172,6 @@ def data_input():
                     t1Active = False
                     t2Active = False
                 if t1Border.collidepoint(event.pos):
-                    Y_0Active = False
                     v_xActive = False
                     v_yActive = False
                     m_pActive = False
@@ -1185,7 +1180,6 @@ def data_input():
                     t1Active = True
                     t2Active = False
                 if t2Border.collidepoint(event.pos):
-                    Y_0Active = False
                     v_xActive = False
                     v_yActive = False
                     m_pActive = False
@@ -1195,7 +1189,6 @@ def data_input():
                     t2Active = True
 
             if event.type == pygame.KEYDOWN:
-                #wprowadzanie_danych(H_startuActive, HH_startu)
                 if H_startuActive:
                     if event.key == pygame.K_BACKSPACE:
                         HH_startu = HH_startu[:-1]
@@ -1222,7 +1215,6 @@ def data_input():
                         pass
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_DOWN:
-                            Y_0Active = False
                             v_xActive = False
                             v_yActive = False
                             m_pActive = False
@@ -1238,7 +1230,6 @@ def data_input():
                         pass
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_DOWN:
-                            Y_0Active = False
                             v_xActive = False
                             v_yActive = False
                             m_pActive = True
@@ -1254,27 +1245,11 @@ def data_input():
                         pass
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_DOWN:
-                            Y_0Active = False
                             v_xActive = False
                             v_yActive = True
                             m_pActive = False
                             H_startuActive = False
-                if Y_0Active:
-                    if event.key == pygame.K_BACKSPACE:
-                        YY_0 = YY_0[:-1]
-                    if event.key == pygame.K_1 or event.key == pygame.K_2 or event.key == pygame.K_3 or event.key == pygame.K_4 or event.key == pygame.K_5 \
-                            or event.key == pygame.K_6 or event.key == pygame.K_7 or event.key == pygame.K_8 or event.key == pygame.K_9 or event.key == pygame.K_0 \
-                            or event.key == pygame.K_PERIOD:
-                        YY_0 += event.unicode
-                    else:
-                        pass
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_DOWN:
-                            Y_0Active = False
-                            v_xActive = True
-                            v_yActive = False
-                            m_pActive = False
-                            H_startuActive = False
+
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
@@ -1377,17 +1352,17 @@ def data_input():
 
                 jak_często = 100
 
-                obliczenia_numeryczne(0, 0, H_startu, 0)  # Silniki nie zadzaiłały
+                obliczenia_numeryczne(0, 1, H_startu, 0)  # Silniki nie zadzaiłały
 
                 reset_xyv()  # resetuje wartości po I przelocie
 
-                obliczenia_numeryczne(1, 0, H_startu, 0)  # I faza ruchu - do odpalenia silników
+                obliczenia_numeryczne(1, 1, H_startu, 0)  # I faza ruchu - do odpalenia silników
                 if Hnpm > H_startu:
                     update_important_values(X_location, Y_location, droga, Hnpm / 1000, a_xy(a_x, a_y), v_xy(v_x, v_y))
                     test1 = 1
                 droga1 = droga
 
-                obliczenia_numeryczne(2, 0, H_startu, 0)  # II faza ruchu - z silnikami
+                obliczenia_numeryczne(2, 1, H_startu, 0)  # II faza ruchu - z silnikami
                 if test == 1:
                     if test1 == 0:
                         update_important_values(x_forplot[1], y_forplot[1], droga_l[1], listH_xy[1], a_xy_l[1],
@@ -1397,7 +1372,7 @@ def data_input():
                     test = 0
                 droga2 = droga
 
-                obliczenia_numeryczne(3, 0, H_startu, 0)  # III faza ruchu - po wyczerpaniu paliwa
+                obliczenia_numeryczne(3, 1, H_startu, 0)  # III faza ruchu - po wyczerpaniu paliwa
 
                 x_forplot.remove(x_forplot[0])
                 y_forplot.remove(y_forplot[0])
@@ -1428,7 +1403,6 @@ def wlasciwosci_planety():
     YY_1 = '20'
     HH_startu1 = ''
     vv_x1 = ''
-
 
     M_ZActive = False
     R_ZActive = False
@@ -1477,6 +1451,7 @@ def wlasciwosci_planety():
             MM_Z = "0.0735"
             RR_Z = "1738"
             ddensity = '0'
+
         screen.blit(ksiezycText, (900, int(screen_height - 640) + 7))
 
         # merkury
@@ -1492,7 +1467,7 @@ def wlasciwosci_planety():
         if wenusButtton:
             MM_Z = "4.87"
             RR_Z = "6051.8"
-            ddensity = '113,32'
+            ddensity = '113.32'
         screen.blit(wenusText, (900, int(screen_height - 520) + 7))
 
         # mars
@@ -2317,14 +2292,14 @@ def wlasciwosci_rakiety():
             spin = 0  # spin = 1 odpalamy spinlauncha
             if spin != 1:
                 print('--------------------------')
-                obliczenia_numeryczne(1, 0, H_startu, tryb_pracy_silników)  # I faza ruchu - do odpalenia silników
+                obliczenia_numeryczne(1, 1, H_startu, tryb_pracy_silników)  # I faza ruchu - do odpalenia silników
                 if czy_faza1 == 1:
                     update_important_values(X_location, Y_location, droga, Hnpm / 1000, a_xy(a_x, a_y), v_xy(v_x, v_y))
                     test1 = 1
 
                 droga1 = droga
                 print('--------------------------')
-                obliczenia_numeryczne(2, 0, H_startu, tryb_pracy_silników)  # II faza ruchu - z silnikami
+                obliczenia_numeryczne(2, 1, H_startu, tryb_pracy_silników)  # II faza ruchu - z silnikami
 
                 if test == 1:
                     if test1 == 0:
@@ -2335,7 +2310,7 @@ def wlasciwosci_rakiety():
                     test = 0
                 droga2 = droga
                 print('--------------------------')
-                obliczenia_numeryczne(3, 0, H_startu, tryb_pracy_silników)  # III faza ruchu - po wyczerpaniu paliwa
+                obliczenia_numeryczne(3, 1, H_startu, tryb_pracy_silników)  # III faza ruchu - po wyczerpaniu paliwa
 
                 x_forplot.remove(x_forplot[0])
                 y_forplot.remove(y_forplot[0])

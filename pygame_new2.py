@@ -591,7 +591,8 @@ def wyświetlanie_wykresów(orbita, dane):
         alfa = np.arange(0, np.pi * 2, 0.001)
         plt.plot(R_Z * np.cos(theta), R_Z * np.sin(theta), lw=2, color='b',
                  label='Ziemia')  # model ziemi
-        plt.plot((R_Z + 85000) * np.cos(alfa), (R_Z + 85000) * np.sin(alfa), color='y', lw=0.3, label='Koniec atmosfery')
+        if ro > 0:
+            plt.plot((R_Z + 100000) * np.cos(alfa), (R_Z + 100000) * np.sin(alfa), color='y', lw=0.3, label='Koniec atmosfery')
         try:
             plt.scatter(wazny_x, wazny_y, label='Działanie silników')  # początak i start działania silników
         except:
@@ -607,23 +608,9 @@ def wyświetlanie_wykresów(orbita, dane):
         ax = plt.subplot()
         cursor = Cursor(ax, horizOn=True, vertOn=True, linewidth=0.5, color='Black')
 
-        wm = plt.get_current_fig_manager()
-        wm.window.state('zoomed')
-        mng = plt.get_current_fig_manager()
-        mng.resize(*mng.window.maxsize())
+        get_fullscreen()
 
         matplotlib.pyplot.subplots_adjust(left=0.133, bottom=0.269, right=0.691, top=0.962, wspace=None, hspace=None)
-
-        '''ax.subplots_adjust(bottom=0.25)
-        axslider = ax.add_axes([0.1, 0.1, 0.6, 0.05])
-        slider = Slider(ax=axslider, label="Time", valmin=0, valmax=i-1, valstep=1)
-        def update(indx):
-            ax1.scatter(x_forplot[indx], y_forplot[indx], color='Black')
-        ax.canvas.draw_idle()
-        slider.on_changed(update)'''
-
-        #figManager = plt.get_current_fig_manager()
-        #figManager.window.showMaximized()
 
     if dane == 1:
         plt.plot(range(10),  'ro-')
@@ -697,10 +684,7 @@ def wyświetlanie_wykresów(orbita, dane):
         ad = plt.subplot(414)
         cursor4 = Cursor(ad, horizOn=True, vertOn=True, linewidth=0.5, color='Black')
 
-        wm = plt.get_current_fig_manager()
-        wm.window.state('zoomed')
-        mng = plt.get_current_fig_manager()
-        mng.resize(*mng.window.maxsize())
+        get_fullscreen()
 
         matplotlib.pyplot.subplots_adjust(left=0.063, bottom=0.25, right=0.78, top=0.985, wspace=None, hspace=None)
 
@@ -725,7 +709,8 @@ def animated_plot():
     alfa = np.arange(0, np.pi * 2, 0.001)
     ax1.plot(R_Z * np.cos(theta), R_Z * np.sin(theta), lw=2, color='b',
              label='Ziemia')  # model ziemi
-    ax1.plot((R_Z + 85000) * np.cos(alfa), (R_Z + 85000) * np.sin(alfa), color='y', lw=0.3,
+    if ro > 0:
+        ax1.plot((R_Z + 100000) * np.cos(alfa), (R_Z + 100000) * np.sin(alfa), color='y', lw=0.3,
              label='Koniec atmosfery')
     ax1.text(n, 0.2 * R_Z, napis_prędkości, fontsize=10)
     ax1.text(n, 0.1 * R_Z, napis_paliwa, fontsize=10)
@@ -809,13 +794,8 @@ def animated_plot():
     import matplotlib
 
     anim = matplotlib.animation.FuncAnimation(fig, rzut, init_func=rzut1, blit=True, interval=2)
-    #anim = matplotlib.animation.FuncAnimation(fig, rzut, blit=True, interval=1)
 
-
-    wm = plt.get_current_fig_manager()
-    wm.window.state('zoomed')
-    mng = plt.get_current_fig_manager()
-    mng.resize(*mng.window.maxsize())
+    get_fullscreen()
 
     matplotlib.pyplot.subplots_adjust(left=0.133, bottom=0.269, right=0.691, top=0.962, wspace=None, hspace=None)
 
@@ -840,7 +820,8 @@ def animated_plot_piaskownica():
     alfa = np.arange(0, np.pi * 2, 0.001)
     ax1.plot(R_Z * np.cos(theta), R_Z * np.sin(theta), lw=2, color='b',
              label='Ziemia')  # model ziemi
-    ax1.plot((R_Z + 85000) * np.cos(alfa), (R_Z + 85000) * np.sin(alfa), color='y', lw=0.3,
+    if ro > 0:
+        ax1.plot((R_Z + 100000) * np.cos(alfa), (R_Z + 100000) * np.sin(alfa), color='y', lw=0.3,
              label='Koniec atmosfery')
     ax1.text(n, 0.2 * R_Z, napis_prędkości, fontsize=10)
     ax1.text(n, 0.1 * R_Z, napis_paliwa, fontsize=10)
@@ -863,8 +844,6 @@ def animated_plot_piaskownica():
             y_forplot_animated.append(y_forplot[q])
             droga_l_animated.append(droga_l[q])
 
-    print(len(x_forplot_animated), len(y_forplot_animated), len(droga_l_animated))
-
     def rzut(t):
         global test0, test01, test02, test03
         try:
@@ -876,43 +855,40 @@ def animated_plot_piaskownica():
         if test0 == 0:
             if test01 == 0:
                 if droga_l_animated[t] > droga1:
-                    print(t)
+                    test01 = 1
                     try:
-                        plt.scatter(wazny_x[0], wazny_y[0], label='Odpalenie silników')  # początak i start działania silników
+                        plt.scatter(wazny_x[0], wazny_y[0],
+                                    label='Odpalenie silników')  # początak i start działania silników
                         plt.legend()
                     except:
                         pass
-                    test01 = 1
-
+            if test02 == 0:
                 if droga_l_animated[t] > droga2:
-                    print(t)
+                    test02 = 1
                     test0 = 1
                     try:
-                        plt.scatter(wazny_x[1], wazny_y[1], label='Wygaszenie silników')  # początak i start działania silników
+                        plt.scatter(wazny_x[1], wazny_y[1],
+                                    label='Wygaszenie silników')  # początak i start działania silników
                         plt.legend()
                     except:
                         pass
-        else:
-            pass
 
         line.set_data(x_data, y_data)
         return line,
 
-    import matplotlib
-
     anim = matplotlib.animation.FuncAnimation(fig, rzut, blit=True, interval=1)
 
-
-    wm = plt.get_current_fig_manager()
-    wm.window.state('zoomed')
-    mng = plt.get_current_fig_manager()
-    mng.resize(*mng.window.maxsize())
+    get_fullscreen()
 
     matplotlib.pyplot.subplots_adjust(left=0.133, bottom=0.269, right=0.691, top=0.962, wspace=None, hspace=None)
 
     plt.show()
 
-
+def get_fullscreen():
+    wm = plt.get_current_fig_manager()
+    wm.window.state('zoomed')
+    mng = plt.get_current_fig_manager()
+    mng.resize(*mng.window.maxsize())
 ########################################################################################################################
 
 pygame.init()
@@ -932,6 +908,7 @@ font = pygame.font.SysFont("Comfortaa_Regular", 50)
 smallfont = pygame.font.SysFont("Comfortaa_Regular", 40)
 titlefont = pygame.font.SysFont('Comfortaa_Regular', 70)
 littlefont = pygame.font.SysFont('Comfortaa_Thin', 30)
+tinyfont = pygame.font.SysFont('Comfortaa_Thin', 15)
 slategrey = (112, 128, 144)
 lightgrey = (165, 175, 185)
 blackish = (10, 10, 10)
@@ -943,16 +920,18 @@ gold = (238,180,34)
 
 # obrazy----------------------------------------------------------------------------------------------------------------
 spinlaunchImg = pygame.image.load("SpinLaunch.logo.jpg")
-#earthImg = pygame.image.load('earth.jpg')
-#slImg = pygame.image.load('SpinLaunch.png')
 misteryImg = pygame.image.load('mistery.jpg')
-#gradient = pygame.image.load('dark-blue-green.jpg')
-#gradientImg = pygame.transform.scale(gradient, (1520, 800))
 infoImg = pygame.image.load('ospinlaunchu.png')
-spin = pygame.image.load('spin.jpg')
-spinImg = pygame.transform.scale(spin, (400, 200))
-rocket = pygame.image.load('spinlaunch-2.jpg')
-rocketImg = pygame.transform.scale(rocket, (380, 200))
+spinImg = pygame.image.load('spin.jpg')
+#spinImg = pygame.transform.scale(spin, (400, 200))
+rocketImg = pygame.image.load('spinlaunch-2.jpg')
+#rocketImg = pygame.transform.scale(rocket, (380, 200))
+numImg = pygame.image.load('metodanum.png')
+wzoryImg = pygame.image.load('wzory.png')
+wrefImg = pygame.image.load('wartosciref.png')
+spinlImg = pygame.image.load('spinlaunch.png')
+planetaImg = pygame.image.load('objplaneta.png')
+rakietaImg = pygame.image.load('objrakieta.png')
 
 # funkcja przycisku ----------------------------------------------------------------------------------------------------
 def create_button(x, y, width, height, hovercolor, defaultcolor):
@@ -1000,7 +979,7 @@ def intro():
 
 # menu glowne-----------------------------------------------------------------------------------------------------------
 def menu():
-    instruction = titlefont.render("WYBIERZ OPCJĘ", True, white)
+    instruction = titlefont.render("WYBIERZ OPCJĘ", True, gold)
     programText = font.render("TEORIA", True, white)
     teoriaText = font.render("PROGRAM", True, white)
 
@@ -1037,24 +1016,15 @@ def menu():
 
 # wybór trybu-----------------------------------------------------------------------------------------------------------
 def wybor_trybu():
-    instruction = titlefont.render("WYBIERZ TRYB", True, white)
+    instruction = titlefont.render("WYBIERZ TRYB", True, gold)
     programText = font.render("SPINLAUNCH", True, white)
     teoriaText = font.render("PIASKOWNICA", True, white)
-    back = littlefont.render('WSTECZ', True, white)
 
 
     while True:
         screen.fill((0, 0, 0))
         screen.blit(misteryImg, (0, 0))
         screen.blit(instruction, ((screen_width - instruction.get_width()) / 2, 50))
-
-        backButtton = create_button(100, screen_height * .9,
-                                    back.get_width() + 10, back.get_height(), blackish, royalblue)
-
-        screen.blit(back, (105, int(screen_height * .9)))
-
-        if backButtton:
-            menu()
 
         programButtton = create_button((screen_width/2)-150, int(screen_height * .33), 300, 50, blackish,royalblue)
 
@@ -1088,7 +1058,7 @@ def data_input():
     global droga1, droga2
     przywracanie_do_poczatkowych()
     title_text = font.render("WPROWADŹ NASTĘPUJĄCE PARAMETRY", True, gold)
-    back = littlefont.render('WSTECZ', True, white)
+    back = font.render('Wstecz', True, white)
     vv_x = ''
     vv_y = ''
     mm_p = ''
@@ -1114,54 +1084,56 @@ def data_input():
         screen.fill((0, 0, 0))
         screen.blit(misteryImg, (0, 0))
         screen.blit(title_text, (40, 20))
+        screen.blit(wrefImg, (50, 390))
 
-        backButtton = create_button(100, screen_height * .9,
+        backButtton = create_button(1000, screen_height * .9,
                                     back.get_width() + 10, back.get_height(), blackish, royalblue)
 
-        screen.blit(back, (105, int(screen_height * .9)))
+        screen.blit(back, (1005, int(screen_height * .9)))
 
         if backButtton:
             wybor_trybu()
+
         # v_x
         v_xSurface = littlefont.render(vv_x, True, white)
-        v_xBorder = pygame.Rect(650, screen_height - 620,
+        v_xBorder = pygame.Rect(650, screen_height - 700,
                                 v_xSurface.get_width() + 10, 40)
-        screen.blit(v_xSurface, (655, screen_height - 610))
+        screen.blit(v_xSurface, (655, screen_height - 690))
 
         # v_y
         v_ySurface = littlefont.render(vv_y, True, white)
-        v_yBorder = pygame.Rect(650, screen_height - 550,
+        v_yBorder = pygame.Rect(650, screen_height - 630,
                                 v_ySurface.get_width() + 10, 40)
-        screen.blit(v_ySurface, (655, screen_height - 540))
+        screen.blit(v_ySurface, (655, screen_height - 610))
 
         # m_p
         m_pSurface = littlefont.render(mm_p, True, white)
-        m_pBorder = pygame.Rect(650, screen_height - 480,
+        m_pBorder = pygame.Rect(650, screen_height - 560,
                                 m_pSurface.get_width() + 10, 40)
-        screen.blit(m_pSurface, (655, screen_height - 470))
+        screen.blit(m_pSurface, (655, screen_height - 540))
 
         # H_startu
         H_startuSurface = littlefont.render(HH_startu, True, white)
-        H_startuBorder = pygame.Rect(650, screen_height - 410,
+        H_startuBorder = pygame.Rect(650, screen_height - 490,
                                      H_startuSurface.get_width() + 10, 40)
-        screen.blit(H_startuSurface, (655, screen_height - 400))
+        screen.blit(H_startuSurface, (655, screen_height - 480))
 
         #okineka tryb silników
             #t0
         t0Surface = littlefont.render(t0, True, white)
-        t0Border = pygame.Rect(1000, screen_height - 540,
+        t0Border = pygame.Rect(900, screen_height - 640,
                                      t0Surface.get_width() + 10, 40)
-        screen.blit(t0Surface, (1005, screen_height - 530))
+        screen.blit(t0Surface, (905, screen_height - 630))
             #t1
         t1Surface = littlefont.render(t1, True, white)
-        t1Border = pygame.Rect(1000, screen_height - 440,
+        t1Border = pygame.Rect(900, screen_height - 540,
                                t1Surface.get_width() + 10, 40)
-        screen.blit(t1Surface, (1005, screen_height - 430))
+        screen.blit(t1Surface, (905, screen_height - 530))
             #t2
         t2Surface = littlefont.render(t2, True, white)
-        t2Border = pygame.Rect(1000, screen_height - 340,
+        t2Border = pygame.Rect(900, screen_height - 440,
                                t2Surface.get_width() + 10, 40)
-        screen.blit(t2Surface, (1005, screen_height - 330))
+        screen.blit(t2Surface, (905, screen_height - 430))
 
 
         for event in pygame.event.get():
@@ -1363,23 +1335,23 @@ def data_input():
             t2Prompt = littlefont.render("tryb 2 - sila ciągu zawsze działa", True, slategrey)
             t2Prompt1 = littlefont.render("równolegle do powierzchni ziemi", True, slategrey)
 
-        screen.blit(v_xPrompt, (50, (screen_height - 630) + v_xSurface.get_height()))
-        screen.blit(v_yPrompt, (50, (screen_height - 560) + v_ySurface.get_height()))
-        screen.blit(m_pPrompt, (50, (screen_height - 490) + m_pSurface.get_height()))
-        screen.blit(H_startuPrompt, (50, (screen_height - 420) + H_startuSurface.get_height()))
-        screen.blit(t0Prompt, (1100, (screen_height - 550) + t0Surface.get_height()))
-        screen.blit(t1Prompt, (1100, (screen_height - 450) + t1Surface.get_height()))
-        screen.blit(t1Prompt1, (1100, (screen_height - 420) + t1Surface.get_height()))
-        screen.blit(t2Prompt, (1100, (screen_height - 350) + t2Surface.get_height()))
-        screen.blit(t2Prompt1, (1100, (screen_height - 320) + t2Surface.get_height()))
+        screen.blit(v_xPrompt, (50, (screen_height - 710) + v_xSurface.get_height()))
+        screen.blit(v_yPrompt, (50, (screen_height - 640) + v_ySurface.get_height()))
+        screen.blit(m_pPrompt, (50, (screen_height - 570) + m_pSurface.get_height()))
+        screen.blit(H_startuPrompt, (50, (screen_height - 500) + H_startuSurface.get_height()))
+        screen.blit(t0Prompt, (1000, (screen_height - 650) + t0Surface.get_height()))
+        screen.blit(t1Prompt, (1000, (screen_height - 550) + t1Surface.get_height()))
+        screen.blit(t1Prompt1, (1000, (screen_height - 520) + t1Surface.get_height()))
+        screen.blit(t2Prompt, (1000, (screen_height - 450) + t2Surface.get_height()))
+        screen.blit(t2Prompt1, (1000, (screen_height - 420) + t2Surface.get_height()))
         o_silniku = littlefont.render('WYBIERZ TRYB PRACY SILNIKÓW', True, white)
-        screen.blit(o_silniku, (1100,(screen_height - 650) + t2Surface.get_height()))
+        screen.blit(o_silniku, (1000,(screen_height - 750) + t2Surface.get_height()))
 
 
-        readyButtton = create_button((screen_width / 2) - (ready.get_width() / 2), screen_height * .9,
+        readyButtton = create_button(1200, screen_height * .9,
                                      ready.get_width() + 10, ready.get_height(), blackish, royalblue)
 
-        screen.blit(ready, ((screen_width / 2) - (ready.get_width() / 2) + 5, int(screen_height * .9)))
+        screen.blit(ready, (1205, int(screen_height * .9)))
 
         if readyButtton:
             #if YY_0 != "":
@@ -1468,7 +1440,7 @@ def wlasciwosci_planety():
     densityActive = False
 
     ready = font.render("Dalej", True, white)
-    back = littlefont.render('WSTECZ', True, white)
+    back = font.render('Wstecz', True, white)
 
     ksiezycText = font.render("KSIĘŻYC", True, white)
     merkuryText = font.render("MERKURY", True, white)
@@ -1481,6 +1453,8 @@ def wlasciwosci_planety():
     plutonText = font.render("PLUTON", True, white)
     surrealizmText = font.render("SURREALIZM", True, white)
 
+
+
     while True:
 
         # ustawienia tla------------------------------
@@ -1488,6 +1462,7 @@ def wlasciwosci_planety():
         screen.blit(misteryImg, (0, 0))
         screen.blit(title_text, (40,20))
         screen.blit(title1_text, (880, 20))
+        screen.blit(planetaImg, (50, 450))
 
         # surrealizm
         surrealizmButtton = create_button(880, int(screen_height - 700), 300, 50, blackish, royalblue)
@@ -1496,9 +1471,7 @@ def wlasciwosci_planety():
             RR_Z = "6"
             HH_startu1 = '200000'
             vv_x1 = '60000'
-            # DDt = 0
             jjak_często = '1'
-            # ddensity = 0
         screen.blit(surrealizmText, (900, int(screen_height - 700) + 7))
 
         # ksiezyc
@@ -1506,9 +1479,7 @@ def wlasciwosci_planety():
         if ksiezycButtton:
             MM_Z = "0.0735"
             RR_Z = "1738"
-            # DDt = 0
-            # jjak_często = 0
-            # ddensity = 0
+            ddensity = '0'
         screen.blit(ksiezycText, (900, int(screen_height - 640) + 7))
 
         # merkury
@@ -1516,9 +1487,7 @@ def wlasciwosci_planety():
         if merkuryButtton:
             MM_Z = "0.33"
             RR_Z = "2439.7"
-            # DDt = 0
-            # jjak_często = 0
-            # ddensity = 0
+            ddensity = '0'
         screen.blit(merkuryText, (900, int(screen_height - 580) + 7))
 
         # wenus
@@ -1526,9 +1495,7 @@ def wlasciwosci_planety():
         if wenusButtton:
             MM_Z = "4.87"
             RR_Z = "6051.8"
-            # DDt = 0
-            # jjak_często = 0
-            # ddensity = 0
+            ddensity = '113,32'
         screen.blit(wenusText, (900, int(screen_height - 520) + 7))
 
         # mars
@@ -1536,9 +1503,7 @@ def wlasciwosci_planety():
         if marsButtton:
             MM_Z = "0.64"
             RR_Z = "3389.4"
-            # DDt = 0
-            # jjak_często = 0
-            # ddensity = 0
+            ddensity = '0'
         screen.blit(marsText, (900, int(screen_height - 460) + 7))
 
         # jowisz
@@ -1546,9 +1511,7 @@ def wlasciwosci_planety():
         if jowiszButtton:
             MM_Z = "1900"
             RR_Z = "69909"
-            # DDt = 0
-            # jjak_często = 0
-            # ddensity = 0
+            ddensity = '1.326'
         screen.blit(jowiszText, (900, int(screen_height - 400) + 7))
 
         # saturn
@@ -1556,9 +1519,7 @@ def wlasciwosci_planety():
         if saturnButtton:
             MM_Z = "569"
             RR_Z = "58231"
-            # DDt = 0
-            # jjak_często = 0
-            # ddensity = 0
+            ddensity = '0.69'
         screen.blit(saturnText, (900, int(screen_height - 340) + 7))
 
         # uran
@@ -1566,9 +1527,7 @@ def wlasciwosci_planety():
         if uranButtton:
             MM_Z = '86.8'
             RR_Z = '25362'
-            # DDt = 0
-            # jjak_często = 0
-            # ddensity = 0
+            ddensity = '1.219'
         screen.blit(uranText, (900, int(screen_height - 280) + 7))
 
         # neptun
@@ -1576,9 +1535,7 @@ def wlasciwosci_planety():
         if neptunButtton:
             MM_Z = '102.4'
             RR_Z = '24622'
-            # DDt = 0
-            # jjak_często = 0
-            # ddensity = 0
+            ddensity = '609.25'
         screen.blit(neptunText, (900, int(screen_height - 220) + 7))
 
         # pluton
@@ -1586,9 +1543,7 @@ def wlasciwosci_planety():
         if plutonButtton:
             MM_Z = '0.013'
             RR_Z = '1188'
-            # DDt = 0
-            # jjak_często = 0
-            # ddensity = 0
+            ddensity = '0'
         screen.blit(plutonText, (900, int(screen_height - 160) + 7))
 
         # M_Z
@@ -1782,18 +1737,18 @@ def wlasciwosci_planety():
         screen.blit(DtPrompt, (50, (screen_height - 420) + DtSurface.get_height()))
 
 
-        readyButtton = create_button(1400 - 200, screen_height * .9,
+        readyButtton = create_button(1200, screen_height * .9,
                                      ready.get_width() + 10, ready.get_height(), blackish, royalblue)
 
-        screen.blit(ready, (1400 - 195, int(screen_height * .9)))
+        screen.blit(ready, (1205, int(screen_height * .9)))
 
         if readyButtton:
             wlasciwosci_rakiety()
 
-        backButtton = create_button(100, screen_height * .9,
+        backButtton = create_button(1000, screen_height * .9,
                                      back.get_width() + 10, back.get_height(), blackish, royalblue)
 
-        screen.blit(back, (105, int(screen_height * .9)))
+        screen.blit(back, (1005, int(screen_height * .9)))
 
         if backButtton:
             wybor_trybu()
@@ -1807,7 +1762,7 @@ def wlasciwosci_rakiety():
     global x_forplot, x1_forplot, y_forplot, y1_forplot, listR_xy, listH_xy, listH_xy1, wazny_h, wazny_d, wazny_v, wazny_y, wazny_a, wazny_x, v_xy_l, v_x_l, v_y_l, droga_l, a_x_l, a_y_l, a_xy_l, d_a_lx, d_a_ly, ro
     global MM_Z, RR_Z, DDt, jjak_często, ddensity, droga1, droga2, YY_1, vv_x1, HH_startu1
     title_text = font.render("WPROWADŹ NASTĘPUJĄCE PARAMETRY", True, gold)
-    back = littlefont.render('WSTECZ', True, white)
+    back = font.render('Wstecz', True, white)
     przywracanie_do_poczatkowych()
     YY_0 = ''
     vv_x = ''
@@ -1842,6 +1797,7 @@ def wlasciwosci_rakiety():
         screen.fill((0, 0, 0))
         screen.blit(misteryImg, (0, 0))
         screen.blit(title_text, (40, 20))
+        screen.blit(rakietaImg, (800, 450))
 
         backButtton = create_button(100, screen_height * .9,
                                     back.get_width() + 10, back.get_height(), blackish, royalblue)
@@ -1906,19 +1862,19 @@ def wlasciwosci_rakiety():
         # okineka tryb silników
         # t0
         t0Surface = littlefont.render(t0, True, white)
-        t0Border = pygame.Rect(1000, screen_height - 540,
+        t0Border = pygame.Rect(1000, screen_height - 620,
                                t0Surface.get_width() + 10, 40)
-        screen.blit(t0Surface, (1005, screen_height - 530))
+        screen.blit(t0Surface, (1005, screen_height - 610))
         # t1
         t1Surface = littlefont.render(t1, True, white)
-        t1Border = pygame.Rect(1000, screen_height - 440,
+        t1Border = pygame.Rect(1000, screen_height - 540,
                                t1Surface.get_width() + 10, 40)
-        screen.blit(t1Surface, (1005, screen_height - 430))
+        screen.blit(t1Surface, (1005, screen_height - 530))
         # t2
         t2Surface = littlefont.render(t2, True, white)
-        t2Border = pygame.Rect(1000, screen_height - 340,
+        t2Border = pygame.Rect(1000, screen_height - 440,
                                t2Surface.get_width() + 10, 40)
-        screen.blit(t2Surface, (1005, screen_height - 330))
+        screen.blit(t2Surface, (1005, screen_height - 430))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -2282,18 +2238,18 @@ def wlasciwosci_rakiety():
         screen.blit(fPrompt, (50, (screen_height - 350) + fSurface.get_height()))
         screen.blit(v_gPrompt, (50, (screen_height - 280) + v_gSurface.get_height()))
         screen.blit(m_rPrompt, (50, (screen_height - 210) + m_rSurface.get_height()))
-        screen.blit(t0Prompt, (1100, (screen_height - 550) + t0Surface.get_height()))
-        screen.blit(t1Prompt, (1100, (screen_height - 450) + t1Surface.get_height()))
-        screen.blit(t1Prompt1, (1100, (screen_height - 420) + t1Surface.get_height()))
-        screen.blit(t2Prompt, (1100, (screen_height - 350) + t2Surface.get_height()))
-        screen.blit(t2Prompt1, (1100, (screen_height - 320) + t2Surface.get_height()))
+        screen.blit(t0Prompt, (1050, (screen_height - 630) + t0Surface.get_height()))
+        screen.blit(t1Prompt, (1050, (screen_height - 560) + t1Surface.get_height()))
+        screen.blit(t1Prompt1, (1050, (screen_height - 530) + t1Surface.get_height()))
+        screen.blit(t2Prompt, (1050, (screen_height - 460) + t2Surface.get_height()))
+        screen.blit(t2Prompt1, (1050, (screen_height - 430) + t2Surface.get_height()))
         o_silniku = littlefont.render('WYBIERZ TRYB PRACY SILNIKÓW', True, white)
-        screen.blit(o_silniku, (1100, (screen_height - 650) + t2Surface.get_height()))
+        screen.blit(o_silniku, (1050, (screen_height - 700) + t2Surface.get_height()))
 
-        readyButtton = create_button((screen_width / 2) - (ready.get_width() / 2), screen_height * .9,
+        readyButtton = create_button(300, screen_height * .9,
                                      ready.get_width() + 10, ready.get_height(), blackish, royalblue)
 
-        screen.blit(ready, ((screen_width / 2) - (ready.get_width() / 2) + 5, int(screen_height * .9)))
+        screen.blit(ready, (305, int(screen_height * .9)))
 
         if readyButtton:
 
@@ -2364,7 +2320,7 @@ def wlasciwosci_rakiety():
             spin = 0  # spin = 1 odpalamy spinlauncha
             if spin != 1:
                 print('--------------------------')
-                obliczenia_numeryczne(1, 1, H_startu, tryb_pracy_silników)  # I faza ruchu - do odpalenia silników
+                obliczenia_numeryczne(1, 0, H_startu, tryb_pracy_silników)  # I faza ruchu - do odpalenia silników
                 if czy_faza1 == 1:
                     update_important_values(X_location, Y_location, droga, Hnpm / 1000, a_xy(a_x, a_y), v_xy(v_x, v_y))
                     test1 = 1
@@ -2396,16 +2352,15 @@ def wlasciwosci_rakiety():
 
 # informacje o modelu --------------------------------------------------------------------------------------------------
 def teoria():
-    title_text = titlefont.render("TEORIA", True, gold)
+    title_text = titlefont.render("METODA OBLICZENIOWA", True, gold)
 
     next = littlefont.render("DALEJ", True, white)
-    back = littlefont.render('WSTECZ', True, white)
 
     while True:
         screen.fill((0, 0, 0))
         screen.blit(misteryImg, (0, 0))
         screen.blit(title_text, ((screen_width - title_text.get_width()) / 2, 50))
-        screen.blit(spinlaunchImg, ((screen_width - spinlaunchImg.get_width()) / 2, 300))
+        screen.blit(numImg, ((screen_width - numImg.get_width()) / 2, 150))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -2437,7 +2392,7 @@ def spinlaunch_info():
         screen.fill((0, 0, 0))
         screen.blit(misteryImg, (0, 0))
         screen.blit(title_text, ((screen_width - title_text.get_width()) / 2, 50))
-        screen.blit(infoImg, ((screen_width - infoImg.get_width()) / 2, 200))
+        screen.blit(spinlImg, ((screen_width - spinlImg.get_width()) / 2, 200))
         screen.blit(rocketImg, (100, 500))
         screen.blit(spinImg, (1100, 500))
 
@@ -2462,7 +2417,7 @@ def spinlaunch_info():
         clock.tick(15)
 
 def parametry():
-    title_text = titlefont.render("PARAMETRY STAŁE", True, gold)
+    title_text = titlefont.render("WYZNACZANIE TRAJEKTORII", True, gold)
 
     next = littlefont.render("DALEJ", True, white)
     back = littlefont.render('WSTECZ', True, white)
@@ -2471,7 +2426,7 @@ def parametry():
         screen.fill((0, 0, 0))
         screen.blit(misteryImg, (0, 0))
         screen.blit(title_text, ((screen_width - title_text.get_width()) / 2, 50))
-        screen.blit(spinlaunchImg, ((screen_width - spinlaunchImg.get_width()) / 2, 300))
+        screen.blit(wzoryImg, ((screen_width - wzoryImg.get_width()) / 2, 125))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

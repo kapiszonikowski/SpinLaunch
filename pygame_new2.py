@@ -2,9 +2,8 @@ import sys
 import pygame
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.widgets import Cursor, Slider
+from matplotlib.widgets import Cursor
 import matplotlib.animation
-import time
 
 ########################################################################################################################
 
@@ -578,7 +577,6 @@ def wyświetlanie_wykresów(orbita, dane):
     if orbita == 1:
         plt.plot(range(10))
         plt.figure(1)
-        # ax, ax1 = plt.subplots()
         plt.axis('square')
         plt.plot(x_forplot, y_forplot, color='g', label='trajektoria rakiety')
         try:
@@ -597,7 +595,6 @@ def wyświetlanie_wykresów(orbita, dane):
             plt.scatter(wazny_x, wazny_y, label='Działanie silników')  # początak i start działania silników
         except:
             pass
-        #plt.text(-0.2 * R_Z, 0.3 * R_Z, 'z tarciem', fontsize=10)
         plt.text(n, 0.2 * R_Z, napis_prędkości, fontsize=10)
         plt.text(n, 0.1 * R_Z, napis_paliwa, fontsize=10)
         plt.text(n, 0.0 * R_Z, napis_gazów, fontsize=10)
